@@ -22,6 +22,8 @@ from app.ui.course.course_window import CourseWindow
 from app.ui.subject.subject_window import SubjectWindow
 from app.ui.subject_workspace.subject_workspace_window import SubjectWorkspaceWindow
 from app.ui.settings.settings_page import SettingsWindow
+from app.ui.faculty.faculty_window import FacultyWindow
+from app.ui.user.user_window import UserWindow
 
 
 class DashboardWindow:
@@ -274,7 +276,7 @@ class DashboardWindow:
             self.master_frame,
             text="Faculty",
             anchor="w",
-            command=self.placeholder
+            command=self.open_faculty
         )
         self.btn_faculty.pack(fill="x",pady=2)
 
@@ -532,7 +534,7 @@ class DashboardWindow:
             self.administration_frame,
             text="Users",
             anchor="w",
-            command=self.placeholder
+            command=self.open_users
         )
         self.btn_users.pack(fill="x",pady=2)
 
@@ -1157,6 +1159,26 @@ class DashboardWindow:
     def open_departments(self):
         self.clear_workspace()
         DepartmentWindow(self.workspace)
+
+    # =====================================================
+    # OPEN FACULTY
+    # =====================================================
+
+    def open_faculty(self):
+
+        self.clear_workspace()
+
+        FacultyWindow(self.workspace)
+
+    # =====================================================
+    # OPEN USERS
+    # =====================================================
+
+    def open_users(self):
+
+        self.clear_workspace()
+
+        UserWindow(self.workspace)
 
     # =====================================================
     # OPEN COURSES
