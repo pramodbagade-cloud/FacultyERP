@@ -26,7 +26,7 @@ class SubjectService:
 
             course_id,
 
-            semester,
+            semester_id,
 
             subject_type,
 
@@ -76,7 +76,7 @@ class SubjectService:
 
                 course_id,
 
-                int(semester)
+                int(semester_id)
 
         ):
 
@@ -94,7 +94,7 @@ class SubjectService:
 
             course_id=course_id,
 
-            semester=int(semester),
+            semester_id=int(semester_id),
 
             subject_type=subject_type,
 
@@ -163,7 +163,7 @@ class SubjectService:
 
             course_id,
 
-            semester,
+            semester_id,
 
             subject_type,
 
@@ -195,7 +195,7 @@ class SubjectService:
 
             course_id=course_id,
 
-            semester=int(semester),
+            semester_id=int(semester_id),
 
             subject_type=subject_type,
 

@@ -30,7 +30,7 @@ class SubjectRepository:
                 subject_short_name,
                 department_id,
                 course_id,
-                semester,
+                semester_id,
                 subject_type,
                 credits,
                 theory_hours,
@@ -50,7 +50,7 @@ class SubjectRepository:
                 subject.subject_short_name,
                 subject.department_id,
                 subject.course_id,
-                subject.semester,
+                subject.semester_id,
                 subject.subject_type,
                 subject.credits,
                 subject.theory_hours,
@@ -79,7 +79,7 @@ class SubjectRepository:
             ORDER BY
                 department_id,
                 course_id,
-                semester,
+                semester_id,
                 subject_name
             """
         )
@@ -98,7 +98,7 @@ class SubjectRepository:
                     subject_short_name=row["subject_short_name"],
                     department_id=row["department_id"],
                     course_id=row["course_id"],
-                    semester=row["semester"],
+                    semester_id=row["semester_id"],
                     subject_type=row["subject_type"],
                     credits=row["credits"],
                     theory_hours=row["theory_hours"],
@@ -143,7 +143,7 @@ class SubjectRepository:
             subject_short_name=row["subject_short_name"],
             department_id=row["department_id"],
             course_id=row["course_id"],
-            semester=row["semester"],
+            semester_id=row["semester_id"],
             subject_type=row["subject_type"],
             credits=row["credits"],
             theory_hours=row["theory_hours"],
@@ -179,7 +179,7 @@ class SubjectRepository:
 
                 course_id=?,
 
-                semester=?,
+                semester_id=?,
 
                 subject_type=?,
 
@@ -210,7 +210,7 @@ class SubjectRepository:
 
                 subject.course_id,
 
-                subject.semester,
+                subject.semester_id,
 
                 subject.subject_type,
 
@@ -269,7 +269,7 @@ class SubjectRepository:
             subject_name,
             department_id,
             course_id,
-            semester
+            semester_id
     ):
 
         conn = DatabaseManager.get_connection()
@@ -294,7 +294,7 @@ class SubjectRepository:
 
                     AND course_id=?
 
-                    AND semester=?
+                    AND semester_id=?
 
                )
             """,
@@ -309,7 +309,7 @@ class SubjectRepository:
 
                 course_id,
 
-                semester
+                semester_id
 
             )
 

@@ -1170,7 +1170,7 @@ class SubjectWindow:
                     course.course_name
                     if course else "",
 
-                    subject.semester,
+                    subject.semester_id,
 
                     subject.credits
 

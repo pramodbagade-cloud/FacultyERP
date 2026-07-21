@@ -24,6 +24,8 @@ from app.ui.subject_workspace.subject_workspace_window import SubjectWorkspaceWi
 from app.ui.settings.settings_page import SettingsWindow
 from app.ui.faculty.faculty_window import FacultyWindow
 from app.ui.user.user_window import UserWindow
+from app.ui.semester.semester_window import SemesterWindow
+
 
 
 class DashboardWindow:
@@ -279,6 +281,15 @@ class DashboardWindow:
             command=self.open_faculty
         )
         self.btn_faculty.pack(fill="x",pady=2)
+
+
+        self.btn_semesters = ctk.CTkButton(
+            self.master_frame,
+            text="Semesters",
+            anchor="w",
+            command=self.open_semesters
+        )
+        self.btn_semesters.pack(fill="x",pady=2)
 
         self.btn_students=ctk.CTkButton(
             self.master_frame,
@@ -1063,6 +1074,7 @@ class DashboardWindow:
             "This module will be available in the next development phase."
         )
 
+
     # =====================================================
     # TOGGLE SECTIONS
     # =====================================================
@@ -1198,6 +1210,17 @@ class DashboardWindow:
 
         SubjectWindow(self.workspace)
     
+    # =====================================================
+    # OPEN SEMESTERS
+    # =====================================================
+
+    def open_semesters(self):
+
+        self.clear_workspace()
+
+        SemesterWindow(self.workspace)
+
+
     # =====================================================
     # OPEN SETTINGS
     # =====================================================

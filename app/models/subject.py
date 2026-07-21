@@ -23,7 +23,7 @@ class Subject:
 
     course_id: int = 0
 
-    semester: int = 1
+    semester_id: int = 1
 
     subject_type: str = "Theory"
 

@@ -32,11 +32,13 @@ class FacultyERP:
             AppConfig.MIN_HEIGHT
         )
 
-        ThemeManager().apply()
-
         AppLogger.initialize()
 
         DatabaseManager.initialize()
+
+        theme_manager = ThemeManager()
+
+        theme_manager.load_settings()
 
     def run(self):
 

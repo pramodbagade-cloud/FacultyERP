@@ -11,6 +11,9 @@ from app.ui.course.course_window import CourseWindow
 from app.ui.subject.subject_window import SubjectWindow
 from app.ui.faculty.faculty_window import FacultyWindow
 from app.ui.students.student_window import StudentWindow
+from app.ui.academic_year.academic_year_window import AcademicYearWindow
+from app.ui.semester.semester_window import SemesterWindow
+from app.ui.division.division_window import DivisionWindow
 
 
 class AcademicMastersWindow:
@@ -159,6 +162,10 @@ class AcademicMastersWindow:
     # ==========================================================
     # OPEN MODULE
     # ==========================================================
+        # ==========================================================
+    # OPEN MODULE
+    # ==========================================================
+
     def open_module(self, module):
 
         if module == "Departments":
@@ -211,24 +218,31 @@ class AcademicMastersWindow:
 
             return
 
-        elif module in (
+        elif module == "Academic Year":
 
-            "Academic Year",
+            AcademicYearWindow(
 
-            "Semesters",
+                self.parent
 
-            "Divisions"
+            )
 
-        ):
+            return
 
-            from tkinter import messagebox
+        elif module == "Semesters":
 
-            messagebox.showinfo(
+            SemesterWindow(
 
-                "FacultyERP",
+                self.parent
 
-                f"{module} module is under development."
+            )
 
+            return
+
+        
+        elif module == "Divisions":
+
+            DivisionWindow(
+                self.parent
             )
 
             return

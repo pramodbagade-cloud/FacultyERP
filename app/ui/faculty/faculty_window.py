@@ -15,6 +15,9 @@ from tkcalendar import DateEntry
 
 from app.services.faculty_service import FacultyService
 from app.services.department_service import DepartmentService
+from app.ui.faculty_subject_assignment.faculty_subject_assignment_window import (
+    FacultySubjectAssignmentWindow
+)
 
 
 
@@ -1024,6 +1027,25 @@ class FacultyWindow:
         )
 
         self.clear_button.pack(
+
+            side="left",
+
+            padx=5
+
+        )
+        self.subject_assignment_button = ctk.CTkButton(
+
+            button_frame,
+
+            text="Subject Assignment",
+
+            width=170,
+
+            command=self.open_subject_assignment
+
+        )
+
+        self.subject_assignment_button.pack(
 
             side="left",
 
@@ -2153,3 +2175,12 @@ class FacultyWindow:
                 message
 
             )
+    # ==========================================================
+    # SUBJECT ASSIGNMENT
+    # ==========================================================
+
+    def open_subject_assignment(self):
+
+        FacultySubjectAssignmentWindow(
+            self.parent
+        )

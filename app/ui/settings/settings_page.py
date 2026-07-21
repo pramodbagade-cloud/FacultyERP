@@ -9,6 +9,7 @@ Personal configuration window for FacultyERP.
 import customtkinter as ctk
 from tkinter import messagebox
 from app.ui.academic_masters.academic_masters_window import AcademicMastersWindow
+from app.ui.settings.appearance_window import AppearanceWindow
 
 
 class SettingsWindow:
@@ -392,15 +393,15 @@ class SettingsWindow:
         )
 
         # ==========================================================
-        # EMPTY CARD (Reserved for future)
+        # APPEARANCE
         # ==========================================================
 
-        self.empty_card = ctk.CTkFrame(
+        self.appearance_card = ctk.CTkFrame(
             self.container,
             corner_radius=12
         )
 
-        self.empty_card.grid(
+        self.appearance_card.grid(
             row=2,
             column=2,
             padx=10,
@@ -409,11 +410,36 @@ class SettingsWindow:
         )
 
         ctk.CTkLabel(
-            self.empty_card,
-            text="Coming Soon",
-            font=("Segoe UI",16,"bold")
+            self.appearance_card,
+            text="🎨",
+            font=("Segoe UI Emoji", 36)
         ).pack(
-            expand=True
+            pady=(20,5)
+        )
+
+        ctk.CTkLabel(
+            self.appearance_card,
+            text="Appearance",
+            font=self.heading_font
+        ).pack()
+
+        ctk.CTkLabel(
+            self.appearance_card,
+            text="Light / Dark\nThemes\nPrimary Color",
+            justify="center",
+            font=self.normal_font
+        ).pack(
+            pady=8
+        )
+
+        ctk.CTkButton(
+            self.appearance_card,
+            text="Open",
+            command=self.open_appearance
+        ).pack(
+            fill="x",
+            padx=20,
+            pady=(10,20)
         )
         # ==========================================================
     # CARD ACTIONS
@@ -438,6 +464,10 @@ class SettingsWindow:
     def open_application(self):
 
         self.placeholder("Application")
+
+    def open_appearance(self):
+
+        AppearanceWindow(self.parent)
 
     # ==========================================================
     # PLACEHOLDER

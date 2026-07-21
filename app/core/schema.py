@@ -9,7 +9,6 @@ Phase-1 Master Tables
 
     Users
     Departments
-    Designations
     Faculty
     Courses
     Subjects
@@ -17,8 +16,17 @@ Phase-1 Master Tables
     Semesters
     Divisions
     Students
+    Institute
+    App Settings
 
-Transaction tables will be added in Phase-2.
+Phase-2 Transaction Tables
+
+    Faculty Subject Assignment
+    Timetable
+    Attendance
+    Internal Assessment
+    Practical Attendance
+    Course File
 """
 
 import sqlite3
@@ -33,365 +41,555 @@ class DatabaseSchema:
     def create(connection: sqlite3.Connection):
 
         cursor = connection.cursor()
-
-        # ==========================================================
+                # ==========================================================
         # USERS
         # ==========================================================
 
-        cursor.execute("""
- 
-        CREATE TABLE IF NOT EXISTS users (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users
+            (
 
-            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            faculty_id INTEGER,
+                faculty_id INTEGER,
 
-            username TEXT UNIQUE NOT NULL,
+                username TEXT UNIQUE NOT NULL,
 
-            password_hash TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
 
-            role TEXT NOT NULL,
+                role TEXT NOT NULL,
 
-            is_active INTEGER NOT NULL DEFAULT 1,
+                is_active INTEGER NOT NULL DEFAULT 1,
 
-            last_login TEXT,
+                last_login TEXT,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-            FOREIGN KEY (faculty_id)
-                REFERENCES faculty(faculty_id)
+                FOREIGN KEY (faculty_id)
+                    REFERENCES faculty(faculty_id)
 
+            )
+            """
         )
-        """)
-
-        # ==========================================================
+                # ==========================================================
         # DEPARTMENTS
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS departments (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS departments
+            (
 
-            department_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                department_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            department_code TEXT UNIQUE NOT NULL,
+                department_code TEXT UNIQUE NOT NULL,
 
-            department_name TEXT UNIQUE NOT NULL,
+                department_name TEXT UNIQUE NOT NULL,
 
-            hod_name TEXT,
+                hod_name TEXT,
 
-            description TEXT,
+                description TEXT,
 
-            is_active INTEGER NOT NULL DEFAULT 1,
+                is_active INTEGER NOT NULL DEFAULT 1,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
+            )
+            """
         )
-        """)
-
-        # ==========================================================
+                # ==========================================================
         # FACULTY
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS faculty (
-            faculty_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            faculty_code TEXT UNIQUE NOT NULL,
-            employee_code TEXT UNIQUE NOT NULL,
-            first_name TEXT NOT NULL,
-            middle_name TEXT,
-            last_name TEXT NOT NULL,
-            gender TEXT,
-            date_of_birth TEXT,
-            mobile TEXT,
-            email TEXT,
-            address TEXT,
-            department_id INTEGER NOT NULL,
-            designation TEXT NOT NULL,
-            joining_date TEXT,
-            employment_type TEXT,
-            qualification TEXT,
-            specialization TEXT,
-            experience REAL DEFAULT 0,
-            research_area TEXT,
-            orcid_id TEXT,
-            google_scholar_id TEXT,
-            scopus_author_id TEXT,
-            vidwan_id TEXT,
-            aicte_id TEXT,
-            university_approved INTEGER NOT NULL DEFAULT 1,
-            photo TEXT,
-            remarks TEXT,
-            is_active INTEGER NOT NULL DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (department_id)
-                REFERENCES departments(department_id)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS faculty
+            (
 
+                faculty_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                faculty_code TEXT UNIQUE NOT NULL,
+
+                employee_code TEXT UNIQUE NOT NULL,
+
+                first_name TEXT NOT NULL,
+
+                middle_name TEXT,
+
+                last_name TEXT NOT NULL,
+
+                gender TEXT,
+
+                date_of_birth TEXT,
+
+                mobile TEXT,
+
+                email TEXT,
+
+                address TEXT,
+
+                department_id INTEGER NOT NULL,
+
+                designation TEXT NOT NULL,
+
+                joining_date TEXT,
+
+                employment_type TEXT,
+
+                qualification TEXT,
+
+                specialization TEXT,
+
+                experience REAL DEFAULT 0,
+
+                research_area TEXT,
+
+                orcid_id TEXT,
+
+                google_scholar_id TEXT,
+
+                scopus_author_id TEXT,
+
+                vidwan_id TEXT,
+
+                aicte_id TEXT,
+
+                university_approved INTEGER NOT NULL DEFAULT 1,
+
+                photo TEXT,
+
+                remarks TEXT,
+
+                is_active INTEGER NOT NULL DEFAULT 1,
+
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                FOREIGN KEY (department_id)
+                    REFERENCES departments(department_id)
+
+            )
+            """
         )
-        """)
-
-        # ==========================================================
+                # ==========================================================
         # COURSES
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS courses (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS courses
+            (
 
-            course_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                course_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            course_code TEXT UNIQUE NOT NULL,
+                course_code TEXT UNIQUE NOT NULL,
 
-            course_name TEXT NOT NULL,
+                course_name TEXT NOT NULL,
 
-            course_short_name TEXT NOT NULL,
+                course_short_name TEXT NOT NULL,
 
-            degree TEXT NOT NULL,
+                degree TEXT NOT NULL,
 
-            pattern TEXT NOT NULL,
+                pattern TEXT NOT NULL,
 
-            duration_years INTEGER NOT NULL,
+                duration_years INTEGER NOT NULL,
 
-            intake INTEGER NOT NULL DEFAULT 0,
+                intake INTEGER NOT NULL DEFAULT 0,
 
-            department_id INTEGER NOT NULL,
+                department_id INTEGER NOT NULL,
 
-            description TEXT,
+                description TEXT,
 
-            is_active INTEGER NOT NULL DEFAULT 1,
+                is_active INTEGER NOT NULL DEFAULT 1,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-            FOREIGN KEY (department_id)
-                REFERENCES departments(department_id),
+                FOREIGN KEY (department_id)
+                    REFERENCES departments(department_id),
 
-            UNIQUE(course_name, department_id, pattern)
+                UNIQUE
+                (
+                    course_name,
+                    department_id,
+                    pattern
+                )
 
+            )
+            """
         )
-        """)
-
-        # ==========================================================
+                # ==========================================================
         # SUBJECTS
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS subjects (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS subjects
+            (
 
-            subject_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                subject_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            subject_code TEXT UNIQUE NOT NULL,
+                subject_code TEXT UNIQUE NOT NULL,
 
-            subject_name TEXT NOT NULL,
+                subject_name TEXT NOT NULL,
 
-            subject_short_name TEXT NOT NULL,
+                subject_short_name TEXT NOT NULL,
 
-            department_id INTEGER NOT NULL,
+                department_id INTEGER NOT NULL,
 
-            course_id INTEGER NOT NULL,
+                course_id INTEGER NOT NULL,
 
-            semester INTEGER NOT NULL,
+                semester_id INTEGER NOT NULL,
 
-            subject_type TEXT NOT NULL,
+                subject_type TEXT NOT NULL,
 
-            credits INTEGER NOT NULL DEFAULT 4,
+                credits INTEGER NOT NULL DEFAULT 4,
 
-            theory_hours INTEGER NOT NULL DEFAULT 0,
+                theory_hours INTEGER NOT NULL DEFAULT 0,
 
-            practical_hours INTEGER NOT NULL DEFAULT 0,
+                practical_hours INTEGER NOT NULL DEFAULT 0,
 
-            tutorial_hours INTEGER NOT NULL DEFAULT 0,
+                tutorial_hours INTEGER NOT NULL DEFAULT 0,
 
-            description TEXT,
+                description TEXT,
 
-            is_active INTEGER NOT NULL DEFAULT 1,
+                is_active INTEGER NOT NULL DEFAULT 1,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-            FOREIGN KEY (department_id)
-                REFERENCES departments(department_id),
+                FOREIGN KEY (department_id)
+                    REFERENCES departments(department_id),
 
-            FOREIGN KEY (course_id)
-                REFERENCES courses(course_id),
+                FOREIGN KEY (course_id)
+                    REFERENCES courses(course_id),
 
-            UNIQUE(subject_name, course_id, semester)
+                FOREIGN KEY (semester_id)
+                    REFERENCES semesters(semester_id),
 
+                UNIQUE
+                (
+                    subject_name,
+                    course_id,
+                    semester_id
+                )
+
+            )
+            """
         )
-        """)
-
-        # ==========================================================
+                # ==========================================================
         # ACADEMIC YEARS
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS academic_years (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS academic_years
+            (
 
-            academic_year_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                academic_year_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            academic_year TEXT UNIQUE NOT NULL,
+                academic_year TEXT UNIQUE NOT NULL,
 
-            start_date TEXT,
+                start_date TEXT,
 
-            end_date TEXT,
+                end_date TEXT,
 
-            is_current INTEGER NOT NULL DEFAULT 0,
+                is_current INTEGER NOT NULL DEFAULT 0,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
+            )
+            """
         )
-        """)
-
-        # ==========================================================
+                # ==========================================================
         # SEMESTERS
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS semesters (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS semesters
+            (
 
-            semester_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                semester_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            semester_no INTEGER UNIQUE NOT NULL,
+                semester_no INTEGER UNIQUE NOT NULL,
 
-            semester_name TEXT NOT NULL,
+                semester_name TEXT NOT NULL,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
+            )
+            """
         )
-        """)
-
-        # ==========================================================
+                # ==========================================================
         # DIVISIONS
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS divisions (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS divisions
+            (
 
-            division_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                division_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            division_name TEXT UNIQUE NOT NULL,
+                division_code TEXT NOT NULL,
 
-            description TEXT,
+                division_name TEXT NOT NULL,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                course_id INTEGER NOT NULL,
 
+                academic_year_id INTEGER NOT NULL,
+
+                semester_id INTEGER NOT NULL,
+
+                intake INTEGER NOT NULL DEFAULT 0,
+
+                is_active INTEGER NOT NULL DEFAULT 1,
+
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                FOREIGN KEY (course_id)
+                    REFERENCES courses(course_id),
+
+                FOREIGN KEY (academic_year_id)
+                    REFERENCES academic_years(academic_year_id),
+
+                FOREIGN KEY (semester_id)
+                    REFERENCES semesters(semester_id),
+
+                UNIQUE
+                (
+                    course_id,
+                    academic_year_id,
+                    semester_id,
+                    division_code
+                )
+
+            )
+            """
         )
-        """)
-        # ==========================================================
+                # ==========================================================
         # STUDENTS
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS students (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS students
+            (
 
-            student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            college_id TEXT UNIQUE NOT NULL,
+                college_id TEXT UNIQUE NOT NULL,
 
-            prn TEXT UNIQUE,
+                prn TEXT UNIQUE,
 
-            roll_no TEXT NOT NULL,
+                roll_no TEXT NOT NULL,
 
-            student_name TEXT NOT NULL,
+                first_name TEXT NOT NULL,
 
-            first_name TEXT,
+                middle_name TEXT,
 
-            middle_name TEXT,
+                last_name TEXT NOT NULL,
 
-            last_name TEXT,
+                gender TEXT,
 
-            gender TEXT,
+                date_of_birth TEXT,
 
-            date_of_birth TEXT,
+                mobile TEXT,
 
-            mobile TEXT,
+                email TEXT,
 
-            email TEXT,
+                parent_name TEXT,
 
-            parent_name TEXT,
+                parent_mobile TEXT,
 
-            parent_mobile TEXT,
+                parent_email TEXT,
+                permanent_address TEXT,
 
-            parent_email TEXT,
+                local_address TEXT,
 
-            address TEXT,
+                emergency_contact_name TEXT,
 
-            photo TEXT,
+                emergency_contact_number TEXT,
+                blood_group TEXT,
 
-            admission_year TEXT NOT NULL,
+                aadhaar_number TEXT,
 
-            academic_year TEXT NOT NULL,
+                photo TEXT,
 
-            department_id INTEGER NOT NULL,
+                admission_year INTEGER,
 
-            course_id INTEGER NOT NULL,
+                academic_year_id INTEGER NOT NULL,
 
-            semester INTEGER NOT NULL,
+                department_id INTEGER NOT NULL,
 
-            division TEXT NOT NULL,
+                course_id INTEGER NOT NULL,
 
-            is_active INTEGER NOT NULL DEFAULT 1,
+                semester_id INTEGER NOT NULL,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                division_id INTEGER NOT NULL,
 
-            FOREIGN KEY (department_id)
-                REFERENCES departments(department_id),
+                is_active INTEGER NOT NULL DEFAULT 1,
 
-            FOREIGN KEY (course_id)
-                REFERENCES courses(course_id)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
+                FOREIGN KEY (academic_year_id)
+                    REFERENCES academic_years(academic_year_id),
+
+                FOREIGN KEY (department_id)
+                    REFERENCES departments(department_id),
+
+                FOREIGN KEY (course_id)
+                    REFERENCES courses(course_id),
+
+                FOREIGN KEY (semester_id)
+                    REFERENCES semesters(semester_id),
+
+                FOREIGN KEY (division_id)
+                    REFERENCES divisions(division_id)
+
+            )
+            """
         )
-        """)
-
+                # ==========================================================
+        # FACULTY SUBJECT ASSIGNMENTS
         # ==========================================================
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS faculty_subject_assignments
+            (
+
+                assignment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                faculty_id INTEGER NOT NULL,
+
+                department_id INTEGER NOT NULL,
+
+                course_id INTEGER NOT NULL,
+
+                semester_id INTEGER NOT NULL,
+
+                subject_id INTEGER NOT NULL,
+
+                academic_year_id INTEGER NOT NULL,
+
+                division_id INTEGER NOT NULL,
+
+                batch_name TEXT DEFAULT 'Full',
+
+                workload_hours REAL DEFAULT 0,
+
+                remarks TEXT,
+
+                is_active INTEGER NOT NULL DEFAULT 1,
+
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                FOREIGN KEY (faculty_id)
+                    REFERENCES faculty(faculty_id),
+
+                FOREIGN KEY (department_id)
+                    REFERENCES departments(department_id),
+
+                FOREIGN KEY (course_id)
+                    REFERENCES courses(course_id),
+
+                FOREIGN KEY (semester_id)
+                    REFERENCES semesters(semester_id),
+
+                FOREIGN KEY (subject_id)
+                    REFERENCES subjects(subject_id),
+
+                FOREIGN KEY (academic_year_id)
+                    REFERENCES academic_years(academic_year_id),
+
+                FOREIGN KEY (division_id)
+                    REFERENCES divisions(division_id),
+
+                UNIQUE
+                (
+                    faculty_id,
+                    subject_id,
+                    academic_year_id,
+                    division_id,
+                    batch_name
+                )
+
+            )
+            """
+        )
+                # ==========================================================
         # INSTITUTE
         # ==========================================================
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS institute (
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS institute
+            (
 
-            institute_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                institute_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            institute_name TEXT NOT NULL,
+                institute_name TEXT NOT NULL,
 
-            short_name TEXT,
+                short_name TEXT,
 
-            university_name TEXT,
+                university_name TEXT,
 
-            address TEXT,
+                address TEXT,
 
-            city TEXT,
+                city TEXT,
 
-            state TEXT,
+                state TEXT,
 
-            pincode TEXT,
+                pincode TEXT,
 
-            website TEXT,
+                website TEXT,
 
-            email TEXT,
+                email TEXT,
 
-            phone TEXT,
+                phone TEXT,
 
-            principal_name TEXT,
+                principal_name TEXT,
 
-            logo TEXT,
+                logo TEXT,
 
-            established_year INTEGER,
+                established_year INTEGER,
 
-            affiliation TEXT,
+                affiliation TEXT,
 
-            accreditation TEXT,
+                accreditation TEXT,
 
-            description TEXT,
+                description TEXT,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
+            )
+            """
         )
-        """)
-
-
+                # ==========================================================
+        # APP SETTINGS
         # ==========================================================
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS app_settings
+            (
+
+                setting_key TEXT PRIMARY KEY,
+
+                setting_value TEXT
+
+            )
+            """
+        )
+                # ==========================================================
         # DEFAULT ADMIN USER
         # ==========================================================
 
         cursor.execute(
-            "SELECT COUNT(*) FROM users"
+            """
+            SELECT COUNT(*)
+            FROM users
+            """
         )
 
         if cursor.fetchone()[0] == 0:
@@ -419,7 +617,7 @@ class DatabaseSchema:
                     1
                 )
             )
-        # ==========================================================
+                    # ==========================================================
         # DEFAULT SEMESTERS
         # ==========================================================
 
@@ -449,89 +647,26 @@ class DatabaseSchema:
                 """
                 INSERT INTO semesters
                 (
-
                     semester_no,
-
                     semester_name
-
                 )
 
                 SELECT ?, ?
 
                 WHERE NOT EXISTS
                 (
-
                     SELECT 1
-
                     FROM semesters
-
                     WHERE semester_no=?
-
                 )
                 """,
-
                 (
-
                     semester_no,
-
                     semester_name,
-
                     semester_no
-
                 )
-
             )
-
-        # ==========================================================
-        # DEFAULT DIVISIONS
-        # ==========================================================
-
-        default_divisions = [
-
-            "A",
-
-            "B",
-
-            "C"
-
-        ]
-
-        for division in default_divisions:
-
-            cursor.execute(
-                """
-                INSERT INTO divisions
-                (
-
-                    division_name
-
-                )
-
-                SELECT ?
-
-                WHERE NOT EXISTS
-                (
-
-                    SELECT 1
-
-                    FROM divisions
-
-                    WHERE division_name=?
-
-                )
-                """,
-
-                (
-
-                    division,
-
-                    division
-
-                )
-
-            )
-
-        # ==========================================================
+                    # ==========================================================
         # DEFAULT ACADEMIC YEAR
         # ==========================================================
 
@@ -539,43 +674,27 @@ class DatabaseSchema:
             """
             INSERT INTO academic_years
             (
-
                 academic_year,
-
                 start_date,
-
                 end_date,
-
                 is_current
-
             )
 
-            SELECT ?,?,?,?
+            SELECT ?, ?, ?, ?
 
             WHERE NOT EXISTS
             (
-
                 SELECT 1
-
                 FROM academic_years
-
             )
             """,
-
             (
-
                 "2026-2027",
-
                 "2026-07-01",
-
                 "2027-06-30",
-
                 1
-
             )
-
         )
-
                 # ==========================================================
         # DEFAULT INSTITUTE
         # ==========================================================
@@ -584,95 +703,93 @@ class DatabaseSchema:
             """
             INSERT INTO institute
             (
-
                 institute_name,
-
                 short_name,
-
                 university_name,
-
                 address,
-
                 city,
-
                 state,
-
                 pincode,
-
                 website,
-
                 email,
-
                 phone,
-
                 principal_name,
-
                 logo,
-
                 established_year,
-
                 affiliation,
-
                 accreditation,
-
                 description
-
             )
 
             SELECT
-                ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 
             WHERE NOT EXISTS
             (
-
                 SELECT 1
-
                 FROM institute
-
             )
             """,
-
             (
-
                 "TSSM's Bhivarabai Sawant College of Engineering & Research",
-
                 "TSSM's BSCOER",
-
                 "Savitribai Phule Pune University",
-
                 "Narhe",
-
                 "Pune",
-
                 "Maharashtra",
-
                 "411041",
-
                 "",
-
                 "",
-
                 "",
-
                 "",
-
                 "",
-
                 2009,
-
                 "AICTE Approved | Affiliated to SPPU",
-
                 "NAAC / NBA",
-
                 "FacultyERP Default Institute Record"
-
             )
-
         )
-
+                # ==========================================================
+        # DEFAULT APPLICATION SETTINGS
         # ==========================================================
+
+        default_settings = [
+
+            ("appearance_mode", "Light"),
+
+            ("theme_name", "Professional Blue"),
+
+            ("accent_color", "#2563EB")
+
+        ]
+
+        for setting_key, setting_value in default_settings:
+
+            cursor.execute(
+                """
+                INSERT INTO app_settings
+                (
+                    setting_key,
+                    setting_value
+                )
+
+                SELECT ?, ?
+
+                WHERE NOT EXISTS
+                (
+                    SELECT 1
+                    FROM app_settings
+                    WHERE setting_key=?
+                )
+                """,
+                (
+                    setting_key,
+                    setting_value,
+                    setting_key
+                )
+            )
+                    # ==========================================================
         # COMMIT
         # ==========================================================
 
         connection.commit()
-        
