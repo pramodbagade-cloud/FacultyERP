@@ -1502,11 +1502,7 @@ class SubjectWindow:
         # Semester
         #
 
-        self.semester_combo.set(
-
-            str(subject.semester)
-
-        )
+        self.semester_combo.set(str(subject.semester_id))
 
         #
         # Credits
