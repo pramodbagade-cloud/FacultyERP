@@ -17,7 +17,6 @@ class DivisionService:
 
     @staticmethod
     def add_division(
-            division_code,
             division_name,
             course_id,
             academic_year_id,
@@ -25,39 +24,25 @@ class DivisionService:
             intake,
             is_active=1
     ):
-
-        division_code = division_code.strip().upper()
-
-        division_name = division_name.strip()
-
-        if division_code == "":
-            raise ValueError("Division Code is required.")
-
-        if division_name == "":
-            raise ValueError("Division Name is required.")
-
+        division_name=division_name.strip().upper()
+        if division_name=="":
+            raise ValueError("Division is required.")
         if course_id is None:
             raise ValueError("Please select Course.")
-
         if academic_year_id is None:
             raise ValueError("Please select Academic Year.")
-
         if semester_id is None:
             raise ValueError("Please select Semester.")
-
-        if intake <= 0:
+        if intake<=0:
             raise ValueError("Intake must be greater than zero.")
-
         if DivisionRepository.exists(
-                course_id,
-                academic_year_id,
-                semester_id,
-                division_code
+            course_id,
+            academic_year_id,
+            semester_id,
+            division_name
         ):
             raise ValueError("Division already exists.")
-
-        division = Division(
-            division_code=division_code,
+        division=Division(
             division_name=division_name,
             course_id=course_id,
             academic_year_id=academic_year_id,
@@ -65,7 +50,6 @@ class DivisionService:
             intake=intake,
             is_active=is_active
         )
-
         DivisionRepository.add(division)
 
     # ==========================================================
@@ -75,7 +59,6 @@ class DivisionService:
     @staticmethod
     def update_division(
             division_id,
-            division_code,
             division_name,
             course_id,
             academic_year_id,
@@ -83,32 +66,19 @@ class DivisionService:
             intake,
             is_active
     ):
-
-        division_code = division_code.strip().upper()
-
-        division_name = division_name.strip()
-
-        if division_code == "":
-            raise ValueError("Division Code is required.")
-
-        if division_name == "":
-            raise ValueError("Division Name is required.")
-
+        division_name=division_name.strip().upper()
+        if division_name=="":
+            raise ValueError("Division is required.")
         if course_id is None:
             raise ValueError("Please select Course.")
-
         if academic_year_id is None:
             raise ValueError("Please select Academic Year.")
-
         if semester_id is None:
             raise ValueError("Please select Semester.")
-
-        if intake <= 0:
+        if intake<=0:
             raise ValueError("Intake must be greater than zero.")
-
-        division = Division(
+        division=Division(
             division_id=division_id,
-            division_code=division_code,
             division_name=division_name,
             course_id=course_id,
             academic_year_id=academic_year_id,
@@ -116,7 +86,6 @@ class DivisionService:
             intake=intake,
             is_active=is_active
         )
-
         DivisionRepository.update(division)
 
     # ==========================================================
@@ -136,6 +105,23 @@ class DivisionService:
     def get_all_divisions():
 
         return DivisionRepository.get_all()
+    
+    # ==========================================================
+    # GET BY COURSE / YEAR / SEMESTER
+    # ==========================================================
+
+    @staticmethod
+    def get_divisions_by_course_year_semester(
+            course_id,
+            academic_year_id,
+            semester_id
+    ):
+
+        return DivisionRepository.get_by_course_year_semester(
+            course_id,
+            academic_year_id,
+            semester_id
+        )
 
     # ==========================================================
     # GET BY ID

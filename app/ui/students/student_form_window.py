@@ -1197,19 +1197,6 @@ class StudentFormWindow:
             value,
             0
         )
-        print("Courses available in handler:", len(self.courses))
-        print("\nSelected Department ID :", self.selected_department_id)
-
-        for course in self.courses:
-
-            print(
-                "Course:",
-                course.course_name,
-                "Course Department ID:",
-                course.department_id,
-                type(course.department_id)
-            )
-
         self.course_map = {}
 
         course_names = []
@@ -1260,20 +1247,12 @@ class StudentFormWindow:
             value,
             0
         )
-        print("\nSelected Course ID :", self.selected_course_id)
+        self.refresh_divisions()
+    # ==========================================================
+    # REFRESH DIVISIONS
+    # ==========================================================
 
-        for division in self.divisions:
-
-            print(
-                "Division:",
-                division.division_name,
-                "Course ID:",
-                division.course_id,
-                "Semester:",
-                division.semester_id,
-                "Academic Year:",
-                division.academic_year_id
-            )
+    def refresh_divisions(self):
 
         self.division_map = {}
 
@@ -1312,6 +1291,8 @@ class StudentFormWindow:
         else:
 
             self.cmb_division.set("")
+
+            self.selected_division_id = 0
 
     # ==========================================================
     # SEMESTER CHANGED

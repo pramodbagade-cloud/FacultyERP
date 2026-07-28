@@ -72,27 +72,9 @@ class DivisionWindow:
         form.grid_columnconfigure(1,weight=1)
         form.grid_columnconfigure(3,weight=1)
 
-        ctk.CTkLabel(form,text="Division Code").grid(
-            row=0,
-            column=0,
-            padx=10,
-            pady=10,
-            sticky="w"
-        )
-
-        self.code_entry=ctk.CTkEntry(form)
-
-        self.code_entry.grid(
-            row=0,
-            column=1,
-            padx=10,
-            pady=10,
-            sticky="ew"
-        )
-
         ctk.CTkLabel(form,text="Division Name").grid(
             row=0,
-            column=2,
+            column=0,
             padx=10,
             pady=10,
             sticky="w"
@@ -102,7 +84,7 @@ class DivisionWindow:
 
         self.name_entry.grid(
             row=0,
-            column=3,
+            column=1,
             padx=10,
             pady=10,
             sticky="ew"
@@ -257,7 +239,6 @@ class DivisionWindow:
 
         columns=(
             "ID",
-            "Code",
             "Division",
             "Course",
             "Academic Year",
@@ -277,7 +258,6 @@ class DivisionWindow:
             self.tree.heading(column,text=column)
 
         self.tree.column("ID",width=60,anchor="center")
-        self.tree.column("Code",width=90,anchor="center")
         self.tree.column("Division",width=180)
         self.tree.column("Course",width=180)
         self.tree.column("Academic Year",width=130,anchor="center")
@@ -399,7 +379,6 @@ class DivisionWindow:
                 "end",
                 values=(
                     division.division_id,
-                    division.division_code,
                     division.division_name,
                     course_name,
                     academic_year_name,
@@ -408,16 +387,15 @@ class DivisionWindow:
                     status
                 )
             )
-                # ==========================================================
+    # ==========================================================
     # CLEAR FORM
     # ==========================================================
 
     def clear_form(self):
-
         self.selected_division_id=None
-        self.code_entry.delete(0,"end")
         self.name_entry.delete(0,"end")
         self.intake_entry.delete(0,"end")
+        self.intake_entry.insert(0,"60")
         if self.course_combo.cget("values"):
             self.course_combo.set(self.course_combo.cget("values")[0])
         if self.academic_year_combo.cget("values"):
@@ -436,19 +414,14 @@ class DivisionWindow:
 
     def save_division(self):
 
-        code=self.code_entry.get().strip()
         name=self.name_entry.get().strip()
         intake=self.intake_entry.get().strip()
-
-        if code=="" or name=="" or intake=="":
+        if name=="" or intake=="":
             messagebox.showwarning("Validation","Please fill all required fields.")
             return
-
         try:
             intake=int(intake)
-
             DivisionService.add_division(
-                code,
                 name,
                 self.course_map[self.course_combo.get()],
                 self.academic_year_map[self.academic_year_combo.get()],
@@ -456,17 +429,13 @@ class DivisionWindow:
                 intake,
                 self.active_var.get()
             )
-
             messagebox.showinfo(
                 "Success",
                 "Division added successfully."
             )
-
             self.clear_form()
             self.load_divisions()
-
         except Exception as ex:
-
             messagebox.showerror(
                 "Error",
                 str(ex)
@@ -494,12 +463,8 @@ class DivisionWindow:
         if division is None:
             return
 
-        self.code_entry.delete(0,"end")
-        self.code_entry.insert(0,division.division_code)
-
         self.name_entry.delete(0,"end")
         self.name_entry.insert(0,division.division_name)
-
         self.intake_entry.delete(0,"end")
         self.intake_entry.insert(0,str(division.intake))
 
@@ -523,7 +488,10 @@ class DivisionWindow:
         self.save_button.configure(state="disabled")
         self.update_button.configure(state="normal")
         self.delete_button.configure(state="normal")
-            # ==========================================================
+
+
+
+    # ==========================================================
     # UPDATE DIVISION
     # ==========================================================
 
@@ -532,21 +500,15 @@ class DivisionWindow:
 
         if self.selected_division_id is None:
             return
-
-        code=self.code_entry.get().strip()
         name=self.name_entry.get().strip()
         intake=self.intake_entry.get().strip()
-
-        if code=="" or name=="" or intake=="":
+        if name=="" or intake=="":
             messagebox.showwarning("Validation","Please fill all required fields.")
             return
-
         try:
             intake=int(intake)
-
             DivisionService.update_division(
                 self.selected_division_id,
-                code,
                 name,
                 self.course_map[self.course_combo.get()],
                 self.academic_year_map[self.academic_year_combo.get()],
@@ -554,17 +516,13 @@ class DivisionWindow:
                 intake,
                 self.active_var.get()
             )
-
             messagebox.showinfo(
                 "Success",
                 "Division updated successfully."
             )
-
             self.clear_form()
             self.load_divisions()
-
         except Exception as ex:
-
             messagebox.showerror(
                 "Error",
                 str(ex)

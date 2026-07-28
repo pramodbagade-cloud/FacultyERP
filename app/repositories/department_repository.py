@@ -281,3 +281,26 @@ class DepartmentRepository:
             created_at=row["created_at"]
 
         )
+    # ==========================================================
+    # GET ID BY NAME
+    # ==========================================================
+
+    @staticmethod
+    def get_id_by_name(department_name):
+
+        department = DepartmentRepository.get_by_name(department_name)
+
+        if department is None:
+
+            return None
+
+        return department.department_id
+
+    # ==========================================================
+    # EXISTS BY NAME
+    # ==========================================================
+
+    @staticmethod
+    def exists_by_name(department_name):
+
+        return DepartmentRepository.get_by_name(department_name) is not None

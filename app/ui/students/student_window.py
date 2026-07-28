@@ -7,11 +7,17 @@ Student Master Window
 import customtkinter as ctk
 import openpyxl
 
+
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 
+
 from openpyxl.styles import Font
+from openpyxl.styles import PatternFill
+from openpyxl.styles import Alignment
+from openpyxl.styles import Border
+from openpyxl.styles import Side
 
 from app.services.student_service import StudentService
 from app.services.department_service import DepartmentService
@@ -20,6 +26,7 @@ from app.services.semester_service import SemesterService
 from app.services.division_service import DivisionService
 from app.services.academic_year_service import AcademicYearService
 from app.ui.students.student_form_window import StudentFormWindow
+from app.ui.students.student_import import StudentImport
 
 
 class StudentWindow:
@@ -93,7 +100,7 @@ class StudentWindow:
         self.build_academic_information()
 
         self.build_toolbar()
-
+        self.build_search_bar()
         self.build_student_grid()
 
         self.load_combo_data()
@@ -357,6 +364,8 @@ class StudentWindow:
             course_name
         )
 
+        self.load_divisions()
+
     # ==========================================================
     # SEMESTER CHANGED
     # ==========================================================
@@ -366,6 +375,8 @@ class StudentWindow:
         self.selected_semester_id = self.semester_map.get(
             semester_name
         )
+
+        self.load_divisions()
 
     # ==========================================================
     # DIVISION CHANGED
@@ -386,6 +397,61 @@ class StudentWindow:
         self.selected_academic_year_id = self.academic_year_map.get(
             academic_year
         )
+
+        self.load_divisions()
+
+    # ==========================================================
+    # LOAD DIVISIONS
+    # ==========================================================
+
+    def load_divisions(self):
+
+        self.division_map.clear()
+
+        if (
+            self.selected_course_id is None
+            or self.selected_academic_year_id is None
+            or self.selected_semester_id is None
+        ):
+            self.cmb_division.configure(values=[])
+            self.cmb_division.set("")
+            return
+
+        divisions = DivisionService.get_divisions_by_course_year_semester(
+            self.selected_course_id,
+            self.selected_academic_year_id,
+            self.selected_semester_id
+        )
+
+        division_names = []
+
+        for division in divisions:
+
+            division_names.append(
+                division.division_name
+            )
+
+            self.division_map[
+                division.division_name
+            ] = division.division_id
+
+        self.cmb_division.configure(
+            values=division_names
+        )
+
+        if division_names:
+
+            self.cmb_division.set(
+                division_names[0]
+            )
+
+            self.on_division_changed(
+                division_names[0]
+            )
+
+        else:
+
+            self.cmb_division.set("")
     # ==========================================================
     # TOOLBAR
     # ==========================================================
@@ -483,33 +549,41 @@ class StudentWindow:
             padx=5
         )
 
-        right_toolbar = ctk.CTkFrame(
-            self.toolbar,
-            fg_color="transparent"
-        )
 
-        right_toolbar.pack(
-            side="right",
+
+    # ==========================================================
+    # SEARCH BAR
+    # ==========================================================
+
+    def build_search_bar(self):
+
+        self.search_frame = ctk.CTkFrame(self.container)
+
+        self.search_frame.pack(
+            fill="x",
             padx=10,
-            pady=10
+            pady=(0,15)
         )
 
         ctk.CTkLabel(
-            right_toolbar,
-            text="Search"
+            self.search_frame,
+            text="Search Student"
         ).pack(
             side="left",
-            padx=(0,10)
+            padx=(15,10),
+            pady=10
         )
 
         self.search_entry = ctk.CTkEntry(
-            right_toolbar,
-            width=320,
+            self.search_frame,
+            width=420,
             placeholder_text="Roll No / Name / PRN / Mobile"
         )
 
         self.search_entry.pack(
-            side="left"
+            side="left",
+            padx=(0,10),
+            pady=10
         )
 
         self.search_entry.bind(
@@ -553,11 +627,66 @@ class StudentWindow:
         sheet.title = "Students"
 
         headers = [
-            "Student Name",
+            "* First Name",
+            "Middle Name",
+            "* Last Name",
+            "* Mobile Number",
+            "* Email Address",
             "PRN",
-            "Mobile",
-            "Email"
+            "Aadhaar Number",
+            "Gender",
+            "Date of Birth",
+            "Parent Name",
+            "Parent Mobile",
+            "Parent Email",
+            "Permanent Address",
+            "Local Address",
+            "Emergency Contact Name",
+            "Emergency Contact Number",
+            "ABC ID",
+            "Remarks"
         ]
+
+        widths = [
+            20,
+            20,
+            20,
+            18,
+            30,
+            18,
+            20,
+            12,
+            15,
+            25,
+            18,
+            30,
+            40,
+            40,
+            25,
+            22,
+            22,
+            30
+        ]
+
+        from openpyxl.styles import PatternFill
+        from openpyxl.styles import Alignment
+        from openpyxl.styles import Border
+        from openpyxl.styles import Side
+
+        header_fill = PatternFill(
+            fill_type="solid",
+            fgColor="1F4E78"
+        )
+
+        header_font = Font(
+            bold=True,
+            color="FFFFFF"
+        )
+
+        thin = Side(
+            style="thin",
+            color="D9D9D9"
+        )
 
         for column, header in enumerate(headers, start=1):
 
@@ -567,22 +696,55 @@ class StudentWindow:
             )
 
             cell.value = header
-
-            cell.font = Font(
-                bold=True
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = Alignment(
+                horizontal="center",
+                vertical="center"
+            )
+            cell.border = Border(
+                left=thin,
+                right=thin,
+                top=thin,
+                bottom=thin
             )
 
             sheet.column_dimensions[
                 cell.column_letter
-            ].width = 30
+            ].width = widths[column - 1]
+
+        sheet.freeze_panes = "A2"
+
+        sheet.auto_filter.ref = sheet.dimensions
+
+        instruction_sheet = workbook.create_sheet(
+            title="Instructions"
+        )
+
+        instruction_sheet["A1"] = "FacultyERP Student Import Instructions"
+
+        instruction_sheet["A1"].font = Font(
+            bold=True,
+            size=14
+        )
+
+        instruction_sheet["A3"] = "1. Fields prefixed with * are mandatory."
+        instruction_sheet["A4"] = "2. Mobile Number must be unique."
+        instruction_sheet["A5"] = "3. Email Address must be unique."
+        instruction_sheet["A6"] = "4. PRN is optional during admission and can be updated later."
+        instruction_sheet["A7"] = "5. Aadhaar Number is optional."
+        instruction_sheet["A8"] = "6. Department, Course, Semester, Division and Academic Year are taken from the Student Master screen."
+        instruction_sheet["A9"] = "7. Do not modify the column headers."
+
+        instruction_sheet.column_dimensions["A"].width = 120
 
         workbook.save(file_path)
 
         messagebox.showinfo(
             "FacultyERP",
-            "Template created successfully."
+            "Student Import Template created successfully."
         )
-            # ==========================================================
+    # ==========================================================
     # STUDENT GRID
     # ==========================================================
 
@@ -596,7 +758,6 @@ class StudentWindow:
             padx=10,
             pady=(0,10)
         )
-
         columns = (
             "Roll No",
             "College ID",
@@ -615,6 +776,18 @@ class StudentWindow:
             show="headings"
         )
 
+        column_widths = {
+            "Roll No": 60,
+            "College ID": 100,
+            "Student Name": 200,
+            "PRN": 120,
+            "Mobile": 110,
+            "Department": 150,
+            "Semester": 75,
+            "Division": 65,
+            "Status": 70
+        }
+
         for column in columns:
 
             self.student_grid.heading(
@@ -624,7 +797,7 @@ class StudentWindow:
 
             self.student_grid.column(
                 column,
-                width=120,
+                width=column_widths[column],
                 anchor="center"
             )
 
@@ -660,11 +833,9 @@ class StudentWindow:
     # ==========================================================
     # REFRESH GRID
     # ==========================================================
-
     def refresh_grid(self):
 
         for item in self.student_grid.get_children():
-
             self.student_grid.delete(item)
 
         students = StudentService.get_all_students()
@@ -672,44 +843,39 @@ class StudentWindow:
         for student in students:
 
             full_name = " ".join(
-                [
-                    value
-                    for value in [
-                        student.first_name,
-                        student.middle_name,
-                        student.last_name
-                    ]
-                    if value
+                value
+                for value in [
+                    student.first_name,
+                    student.middle_name,
+                    student.last_name
                 ]
+                if value
             )
 
             self.student_grid.insert(
                 "",
                 "end",
+                iid=str(student.student_id),
                 values=(
-                    student.student_id,
                     student.roll_no,
                     student.college_id,
-                    f"{student.first_name} {student.middle_name} {student.last_name}".strip(),
+                    full_name,
                     student.prn,
                     student.mobile,
-                    department_name,
-                    semester_name,
-                    division_name,
+                    getattr(student, "department_name", ""),
+                    getattr(student, "semester_name", ""),
+                    getattr(student, "division_name", ""),
                     "Active" if student.is_active else "Inactive"
                 )
             )
-
     # ==========================================================
     # SEARCH STUDENTS
     # ==========================================================
-
     def search_students(self, event=None):
 
         keyword = self.search_entry.get().strip().lower()
 
         for item in self.student_grid.get_children():
-
             self.student_grid.delete(item)
 
         students = StudentService.get_all_students()
@@ -717,20 +883,18 @@ class StudentWindow:
         for student in students:
 
             full_name = " ".join(
-                [
-                    value
-                    for value in [
-                        student.first_name,
-                        student.middle_name,
-                        student.last_name
-                    ]
-                    if value
+                value
+                for value in [
+                    student.first_name,
+                    student.middle_name,
+                    student.last_name
                 ]
+                if value
             )
 
             search_text = " ".join(
                 [
-                    str(student.roll_number),
+                    str(student.roll_no),
                     str(student.college_id),
                     full_name,
                     str(student.prn),
@@ -743,8 +907,9 @@ class StudentWindow:
                 self.student_grid.insert(
                     "",
                     "end",
+                    iid=str(student.student_id),
                     values=(
-                        student.roll_number,
+                        student.roll_no,
                         student.college_id,
                         full_name,
                         student.prn,
@@ -752,10 +917,10 @@ class StudentWindow:
                         getattr(student, "department_name", ""),
                         getattr(student, "semester_name", ""),
                         getattr(student, "division_name", ""),
-                        student.status
+                        "Active" if student.is_active else "Inactive"
                     )
                 )
-                    # ==========================================================
+    # ==========================================================
     # LOAD COMBO DATA
     # ==========================================================
 
@@ -793,19 +958,6 @@ class StudentWindow:
             self.cmb_semester.set(semester_names[0])
             self.on_semester_changed(semester_names[0])
 
-        divisions = DivisionService.get_all_divisions()
-        division_names = []
-
-        for division in divisions:
-            division_names.append(division.division_name)
-            self.division_map[division.division_name] = division.division_id
-
-        self.cmb_division.configure(values=division_names)
-
-        if division_names:
-            self.cmb_division.set(division_names[0])
-            self.on_division_changed(division_names[0])
-
         academic_years = AcademicYearService.get_academic_years()
         academic_year_names = []
 
@@ -825,10 +977,63 @@ class StudentWindow:
 
     def import_excel(self):
 
-        messagebox.showinfo(
-            "FacultyERP",
-            "Excel Import will be completed after StudentService integration."
+        if self.selected_department_id is None:
+
+            messagebox.showwarning(
+                "FacultyERP",
+                "Please select Department."
+            )
+
+            return
+
+        if self.selected_course_id is None:
+
+            messagebox.showwarning(
+                "FacultyERP",
+                "Please select Course."
+            )
+
+            return
+
+        if self.selected_semester_id is None:
+
+            messagebox.showwarning(
+                "FacultyERP",
+                "Please select Semester."
+            )
+
+            return
+
+        if self.selected_division_id is None:
+
+            messagebox.showwarning(
+                "FacultyERP",
+                "Please select Division."
+            )
+
+            return
+
+        if self.selected_academic_year_id is None:
+
+            messagebox.showwarning(
+                "FacultyERP",
+                "Please select Academic Year."
+            )
+
+            return
+
+        importer = StudentImport(
+            parent=self.parent,
+            department_id=self.selected_department_id,
+            course_id=self.selected_course_id,
+            semester_id=self.selected_semester_id,
+            division_id=self.selected_division_id,
+            academic_year_id=self.selected_academic_year_id,
+            admission_year=self.cmb_admission_year.get()
         )
+
+        importer.start()
+        self.load_students()
 
     # ==========================================================
     # ADD STUDENT
@@ -836,9 +1041,13 @@ class StudentWindow:
 
     def add_student(self):
 
-        form = StudentFormWindow(self.parent)
+        form = StudentFormWindow(
+            self.parent
+        )
 
-        self.parent.wait_window(form.window)
+        self.parent.wait_window(
+            form.window
+        )
 
         self.refresh_grid()
 
@@ -848,7 +1057,7 @@ class StudentWindow:
 
     def edit_student(self):
 
-        selected = self.student_tree.focus()
+        selected = self.student_grid.focus()
 
         if not selected:
 
@@ -859,42 +1068,69 @@ class StudentWindow:
 
             return
 
-        values = self.student_tree.item(
-            selected,
-            "values"
+        student = StudentService.get_student(
+            int(selected)
         )
 
-        student_id = values[0]
+        if student is None:
+
+            messagebox.showerror(
+                "FacultyERP",
+                "Student record not found."
+            )
+
+            return
 
         form = StudentFormWindow(
             self.parent,
-            student_id
+            student.student_id
         )
 
-        
         self.parent.wait_window(form.window)
-            
-        
 
         self.refresh_grid()
-
     # ==========================================================
     # DELETE STUDENT
     # ==========================================================
 
     def delete_student(self):
 
-        selected = self.student_grid.selection()
+        selected = self.student_grid.focus()
 
         if not selected:
+
             messagebox.showwarning(
                 "FacultyERP",
                 "Please select a student."
             )
+
             return
 
-        messagebox.showinfo(
+        answer = messagebox.askyesno(
             "FacultyERP",
-            "Delete Student will be implemented in the next phase."
+            "Are you sure you want to delete this student?"
         )
 
+        if not answer:
+
+            return
+
+        success = StudentService.delete_student(
+            int(selected)
+        )
+
+        if success:
+
+            messagebox.showinfo(
+                "FacultyERP",
+                "Student deleted successfully."
+            )
+
+            self.refresh_grid()
+
+        else:
+
+            messagebox.showerror(
+                "FacultyERP",
+                "Unable to delete student."
+            )

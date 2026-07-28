@@ -740,7 +740,7 @@ class SubjectWindow:
 
             row=6,
 
-            column=2,
+            column=0,
 
             padx=10,
 

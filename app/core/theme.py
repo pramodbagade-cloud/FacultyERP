@@ -13,11 +13,8 @@ class ThemeManager:
     """Application theme manager."""
 
     THEMES = {
-
         "Professional Blue": "blue",
-
         "NAAC Green": "green",
-
         "Midnight": "dark-blue"
 
     }

@@ -124,6 +124,17 @@ class CourseService:
         return CourseRepository.get_all()
 
     # ==========================================================
+    # GET COURSES BY DEPARTMENT
+    # ==========================================================
+
+    @staticmethod
+    def get_courses_by_department(department_id):
+
+        return CourseRepository.get_by_department(
+            department_id
+        )
+
+    # ==========================================================
     # GET COURSE
     # ==========================================================
 

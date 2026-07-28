@@ -523,7 +523,8 @@ class StudentRepository:
             return 1
 
         return last_roll + 1
-        # ==========================================================
+
+    # ==========================================================
     # GET BY COLLEGE ID
     # ==========================================================
 
@@ -606,4 +607,62 @@ class StudentRepository:
             created_at=row["created_at"]
 
         )
+    # ==========================================================
+    # GET EXISTING IMPORT DATA
+    # ==========================================================
+
+    @staticmethod
+    def get_existing_import_data():
+
+        conn = DatabaseManager.get_connection()
+
+        cursor = conn.cursor()
+
+        data = {
+            "mobiles": set(),
+            "emails": set(),
+            "prns": set(),
+            "aadhaars": set()
+        }
+
+        cursor.execute(
+            """
+            SELECT
+                mobile,
+                email,
+                prn,
+                aadhaar_number
+            FROM students
+            """
+        )
+
+        rows = cursor.fetchall()
+
+        for row in rows:
+
+            if row["mobile"]:
+
+                data["mobiles"].add(
+                    row["mobile"].strip()
+                )
+
+            if row["email"]:
+
+                data["emails"].add(
+                    row["email"].strip().lower()
+                )
+
+            if row["prn"]:
+
+                data["prns"].add(
+                    row["prn"].strip()
+                )
+
+            if row["aadhaar_number"]:
+
+                data["aadhaars"].add(
+                    row["aadhaar_number"].strip()
+                )
+
+        return data
     

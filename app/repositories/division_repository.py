@@ -17,16 +17,12 @@ class DivisionRepository:
 
     @staticmethod
     def add(division: Division):
-
-        conn = DatabaseManager.get_connection()
-
-        cursor = conn.cursor()
-
+        conn=DatabaseManager.get_connection()
+        cursor=conn.cursor()
         cursor.execute(
             """
             INSERT INTO divisions
             (
-                division_code,
                 division_name,
                 course_id,
                 academic_year_id,
@@ -36,11 +32,10 @@ class DivisionRepository:
             )
             VALUES
             (
-                ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?
             )
             """,
             (
-                division.division_code,
                 division.division_name,
                 division.course_id,
                 division.academic_year_id,
@@ -49,7 +44,6 @@ class DivisionRepository:
                 division.is_active
             )
         )
-
         conn.commit()
 
     # ==========================================================
@@ -57,13 +51,12 @@ class DivisionRepository:
     # ==========================================================
     @staticmethod
     def get_all():
-
-        conn = DatabaseManager.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
+        conn=DatabaseManager.get_connection()
+        cursor=conn.cursor()
+        cursor.execute(
+            """
             SELECT
                 d.division_id,
-                d.division_code,
                 d.division_name,
                 d.course_id,
                 c.course_name,
@@ -84,14 +77,14 @@ class DivisionRepository:
             ORDER BY
                 c.course_name,
                 s.semester_no,
-                d.division_code
-        """)
+                d.division_name
+            """
+        )
         rows=cursor.fetchall()
         divisions=[]
         for row in rows:
             division=Division(
                 division_id=row["division_id"],
-                division_code=row["division_code"],
                 division_name=row["division_name"],
                 course_id=row["course_id"],
                 academic_year_id=row["academic_year_id"],
@@ -105,6 +98,59 @@ class DivisionRepository:
             division.semester_name=row["semester_name"]
             divisions.append(division)
         return divisions
+    # ==========================================================
+    # GET BY COURSE / YEAR / SEMESTER
+    # ==========================================================
+
+    @staticmethod
+    def get_by_course_year_semester(
+            course_id,
+            academic_year_id,
+            semester_id
+    ):
+
+        conn = DatabaseManager.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT *
+            FROM divisions
+            WHERE
+                course_id=?
+                AND academic_year_id=?
+                AND semester_id=?
+                AND is_active=1
+            ORDER BY division_name
+            """,
+            (
+                course_id,
+                academic_year_id,
+                semester_id
+            )
+        )
+
+        rows = cursor.fetchall()
+        print("Divisions Found :", len(rows))
+
+        divisions = []
+
+        for row in rows:
+
+            divisions.append(
+                Division(
+                    division_id=row["division_id"],
+                    division_name=row["division_name"],
+                    course_id=row["course_id"],
+                    academic_year_id=row["academic_year_id"],
+                    semester_id=row["semester_id"],
+                    intake=row["intake"],
+                    is_active=row["is_active"],
+                    created_at=row["created_at"]
+                )
+            )
+
+        return divisions
 
     # ==========================================================
     # GET BY ID
@@ -112,11 +158,8 @@ class DivisionRepository:
 
     @staticmethod
     def get_by_id(division_id):
-
-        conn = DatabaseManager.get_connection()
-
-        cursor = conn.cursor()
-
+        conn=DatabaseManager.get_connection()
+        cursor=conn.cursor()
         cursor.execute(
             """
             SELECT *
@@ -125,33 +168,18 @@ class DivisionRepository:
             """,
             (division_id,)
         )
-
-        row = cursor.fetchone()
-
+        row=cursor.fetchone()
         if row is None:
-
             return None
-
         return Division(
-
             division_id=row["division_id"],
-
-            division_code=row["division_code"],
-
             division_name=row["division_name"],
-
             course_id=row["course_id"],
-
             academic_year_id=row["academic_year_id"],
-
             semester_id=row["semester_id"],
-
             intake=row["intake"],
-
             is_active=row["is_active"],
-
             created_at=row["created_at"]
-
         )
 
     # ==========================================================
@@ -160,16 +188,12 @@ class DivisionRepository:
 
     @staticmethod
     def update(division: Division):
-
-        conn = DatabaseManager.get_connection()
-
-        cursor = conn.cursor()
-
+        conn=DatabaseManager.get_connection()
+        cursor=conn.cursor()
         cursor.execute(
             """
             UPDATE divisions
             SET
-                division_code=?,
                 division_name=?,
                 course_id=?,
                 academic_year_id=?,
@@ -179,7 +203,6 @@ class DivisionRepository:
             WHERE division_id=?
             """,
             (
-                division.division_code,
                 division.division_name,
                 division.course_id,
                 division.academic_year_id,
@@ -189,7 +212,6 @@ class DivisionRepository:
                 division.division_id
             )
         )
-
         conn.commit()
 
     # ==========================================================
@@ -216,19 +238,15 @@ class DivisionRepository:
     # ==========================================================
     # EXISTS
     # ==========================================================
-
     @staticmethod
     def exists(
             course_id,
             academic_year_id,
             semester_id,
-            division_code
+            division_name
     ):
-
-        conn = DatabaseManager.get_connection()
-
-        cursor = conn.cursor()
-
+        conn=DatabaseManager.get_connection()
+        cursor=conn.cursor()
         cursor.execute(
             """
             SELECT division_id
@@ -237,15 +255,14 @@ class DivisionRepository:
                 course_id=?
                 AND academic_year_id=?
                 AND semester_id=?
-                AND division_code=?
+                AND division_name=?
             """,
             (
                 course_id,
                 academic_year_id,
                 semester_id,
-                division_code
+                division_name
             )
         )
-
         return cursor.fetchone() is not None
     

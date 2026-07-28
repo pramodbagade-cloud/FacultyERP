@@ -114,9 +114,10 @@ class LoginWindow:
         )
 
         # Enter in Password -> Login
+
         self.password_entry.bind(
             "<Return>",
-            lambda event: self.login()
+            lambda event: "break" if self.login() is None else "break"
         )
 
         # Enter anywhere -> Login

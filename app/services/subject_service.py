@@ -128,6 +128,21 @@ class SubjectService:
         return SubjectRepository.get_all()
 
     # ==========================================================
+    # GET SUBJECTS BY COURSE & SEMESTER
+    # ==========================================================
+
+    @staticmethod
+    def get_subjects_by_course_semester(
+            course_id,
+            semester_id
+    ):
+
+        return SubjectRepository.get_by_course_semester(
+            course_id,
+            semester_id
+        )
+
+    # ==========================================================
     # GET SUBJECT
     # ==========================================================
 

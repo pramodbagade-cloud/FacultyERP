@@ -85,6 +85,7 @@ class SubjectRepository:
         )
 
         rows = cursor.fetchall()
+        
 
         subjects = []
 
@@ -108,6 +109,91 @@ class SubjectRepository:
                     is_active=row["is_active"],
                     created_at=row["created_at"],
                 )
+            )
+
+        return subjects
+    # ==========================================================
+    # GET BY COURSE & SEMESTER
+    # ==========================================================
+
+    @staticmethod
+    def get_by_course_semester(
+            course_id,
+            semester_id
+    ):
+
+        conn = DatabaseManager.get_connection()
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT *
+
+            FROM subjects
+
+            WHERE
+
+                course_id=?
+
+                AND
+
+                semester_id=?
+
+                AND
+
+                is_active=1
+
+            ORDER BY subject_name
+            """,
+            (
+                course_id,
+                semester_id
+            )
+        )
+
+        rows = cursor.fetchall()
+        print("Subjects Found :", len(rows))
+        subjects = []
+
+        for row in rows:
+
+            subjects.append(
+
+                Subject(
+
+                    subject_id=row["subject_id"],
+
+                    subject_code=row["subject_code"],
+
+                    subject_name=row["subject_name"],
+
+                    subject_short_name=row["subject_short_name"],
+
+                    department_id=row["department_id"],
+
+                    course_id=row["course_id"],
+
+                    semester_id=row["semester_id"],
+
+                    subject_type=row["subject_type"],
+
+                    credits=row["credits"],
+
+                    theory_hours=row["theory_hours"],
+
+                    practical_hours=row["practical_hours"],
+
+                    tutorial_hours=row["tutorial_hours"],
+
+                    description=row["description"],
+
+                    is_active=row["is_active"],
+
+                    created_at=row["created_at"]
+
+                )
+
             )
 
         return subjects

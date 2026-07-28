@@ -115,6 +115,68 @@ class CourseRepository:
             )
 
         return courses
+    # ==========================================================
+    # GET BY DEPARTMENT
+    # ==========================================================
+
+    @staticmethod
+    def get_by_department(department_id):
+
+        conn = DatabaseManager.get_connection()
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT *
+            FROM courses
+            WHERE department_id=?
+            ORDER BY course_name
+            """,
+            (department_id,)
+        )
+
+        rows = cursor.fetchall()
+
+        courses = []
+
+        for row in rows:
+
+            courses.append(
+
+                Course(
+
+                    course_id=row["course_id"],
+
+                    course_code=row["course_code"],
+
+                    course_name=row["course_name"],
+
+                    course_short_name=row["course_short_name"],
+
+                    degree=row["degree"],
+
+                    pattern=row["pattern"],
+
+                    duration_years=row["duration_years"],
+
+                    intake=row["intake"],
+
+                    department_id=row["department_id"],
+
+                    description=row["description"],
+
+                    is_active=row["is_active"],
+
+                    created_at=row["created_at"]
+
+                )
+
+            )
+
+        return courses
+
+
 
     # ==========================================================
     # GET BY ID

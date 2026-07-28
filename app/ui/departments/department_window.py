@@ -9,23 +9,15 @@ Department CRUD Module
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-
 import customtkinter as ctk
-
 from app.services.department_service import DepartmentService
-
 
 class DepartmentWindow:
     """Department Management Screen."""
-
     def __init__(self, parent):
-
         self.parent = parent
-
         self.selected_department_id = None
-
         self.build_ui()
-
         self.initialize()
 
     # ==========================================================
@@ -34,57 +26,11 @@ class DepartmentWindow:
 
     def initialize(self):
 
-        self.update_button.configure(
-
-            state="disabled"
-
-        )
-
-        self.delete_button.configure(
-
-            state="disabled"
-
-        )
-
+        self.update_button.configure(state="disabled")
+        self.delete_button.configure(state="disabled")
         self.load_departments()
+        #self.load_next_department_code()    
 
-        self.load_next_department_code()    
-
-        # ==========================================================
-    # LOAD NEXT DEPARTMENT CODE
-    # ==========================================================
-
-    def load_next_department_code(self):
-
-        code = DepartmentService.get_next_department_code()
-
-        self.code_entry.configure(
-
-            state="normal"
-
-        )
-
-        self.code_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
-        self.code_entry.insert(
-
-            0,
-
-            code
-
-        )
-
-        self.code_entry.configure(
-
-            state="disabled"
-
-        )    
 
     # ==========================================================
     # BUILD UI
@@ -97,59 +43,23 @@ class DepartmentWindow:
         # ---------------------------------------------
 
         for widget in self.parent.winfo_children():
-
             widget.destroy()
-
         self.parent.grid_rowconfigure(3, weight=1)
-
         self.parent.grid_columnconfigure(0, weight=1)
 
         # ---------------------------------------------
         # Title
         # ---------------------------------------------
 
-        title = ctk.CTkLabel(
-
-            self.parent,
-
-            text="Department Management",
-
-            font=("Segoe UI", 24, "bold")
-
-        )
-
-        title.grid(
-
-            row=0,
-
-            column=0,
-
-            sticky="w",
-
-            padx=20,
-
-            pady=(15, 10)
-
-        )
+        title = ctk.CTkLabel(self.parent, text="Department Management", font=("Segoe UI", 24, "bold"))
+        title.grid(row=0, column=0, sticky="w", padx=20, pady=(15, 10))
 
         # ---------------------------------------------
         # Form
         # ---------------------------------------------
 
         form = ctk.CTkFrame(self.parent)
-
-        form.grid(
-
-            row=1,
-
-            column=0,
-
-            sticky="ew",
-
-            padx=20
-
-        )
-
+        form.grid(row=1, column=0, sticky="ew", padx=20)
         form.grid_columnconfigure(1, weight=1)
 
         # ---------------------------------------------
@@ -183,6 +93,13 @@ class DepartmentWindow:
             state="normal"
 
         )
+        self.code_entry.grid(
+            row=0,
+            column=1,
+            padx=10,
+            pady=8,
+            sticky="ew"
+        )
 
         # ---------------------------------------------
         # Department Name
@@ -209,20 +126,7 @@ class DepartmentWindow:
         )
 
         self.name_entry = ctk.CTkEntry(form)
-
-        self.name_entry.grid(
-
-            row=1,
-
-            column=1,
-
-            padx=10,
-
-            pady=8,
-
-            sticky="ew"
-
-        )
+        self.name_entry.grid(row=1, column=1, padx=10, pady=8, sticky="ew")
 
         # ---------------------------------------------
         # HOD
@@ -249,20 +153,7 @@ class DepartmentWindow:
         )
 
         self.hod_entry = ctk.CTkEntry(form)
-
-        self.hod_entry.grid(
-
-            row=2,
-
-            column=1,
-
-            padx=10,
-
-            pady=8,
-
-            sticky="ew"
-
-        )
+        self.hod_entry.grid(row=2, column=1, padx=10, pady=8, sticky="ew")
 
         # ---------------------------------------------
         # Description
@@ -545,132 +436,37 @@ class DepartmentWindow:
         )
 
         if success:
-
-            messagebox.showinfo(
-
-                "Success",
-
-                message
-
-            )
-
+            messagebox.showinfo("Success", message)
             self.load_departments()
-
             self.clear_form()
-
-            self.load_next_department_code()
-
+            
         else:
-
-            messagebox.showwarning(
-
-                "Department",
-
-                message
-
-            )
+            messagebox.showwarning("Department", message)
     # ==========================================================
     # ROW SELECTED
     # ==========================================================
 
     def on_row_selected(self, event):
-
         selected = self.tree.selection()
-
         if not selected:
-
             return
-
         values = self.tree.item(selected[0])["values"]
-
         self.selected_department_id = values[0]
-
         department = DepartmentService.get_department(
-
             self.selected_department_id
-
         )
 
         if department is None:
-
             return
-
-        self.code_entry.configure(
-
-            state="normal"
-
-        )
-
-        self.code_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
-        self.name_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
-        self.hod_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
-        self.description_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
-        self.code_entry.insert(
-
-            0,
-
-            department.department_code
-
-        )
-
-        self.name_entry.insert(
-
-            0,
-
-            department.department_name
-
-        )
-
-        self.hod_entry.insert(
-
-            0,
-
-            department.hod_name
-
-        )
-
-        self.description_entry.insert(
-
-            0,
-
-            department.description
-
-        )
-
-        self.code_entry.configure(
-
-            state="disabled"
-
-        )
-
+        self.code_entry.configure(state="normal")
+        self.code_entry.delete(0, tk.END)
+        self.name_entry.delete(0, tk.END)
+        self.hod_entry.delete(0, tk.END)
+        self.description_entry.delete(0, tk.END)
+        self.code_entry.insert(0, department.department_code)
+        self.name_entry.insert(0, department.department_name)
+        self.hod_entry.insert(0, department.hod_name)
+        self.description_entry.insert(0, department.description)
         self.save_button.configure(state="disabled")
         self.update_button.configure(state="normal")
         self.delete_button.configure(state="normal")
@@ -683,54 +479,28 @@ class DepartmentWindow:
     def update_department(self):
 
         if self.selected_department_id is None:
-
             messagebox.showwarning(
-
                 "Department",
-
                 "Please select a department."
-
             )
-
             return
 
         success, message = DepartmentService.update_department(
-
             self.selected_department_id,
-
             self.code_entry.get(),
-
             self.name_entry.get(),
-
             self.hod_entry.get(),
-
             self.description_entry.get()
-
         )
 
         if success:
-
-            messagebox.showinfo(
-
-                "Success",
-
-                message
-
-            )
-
+            messagebox.showinfo("Success", message)
             self.load_departments()
-
             self.clear_form()
 
         else:
 
-            messagebox.showwarning(
-
-                "Department",
-
-                message
-
-            )
+            messagebox.showwarning("Department", message)
 
     # ==========================================================
     # DELETE DEPARTMENT
@@ -739,58 +509,20 @@ class DepartmentWindow:
     def delete_department(self):
 
         if self.selected_department_id is None:
-
-            messagebox.showwarning(
-
-                "Department",
-
-                "Please select a department."
-
-            )
-
+            messagebox.showwarning("Department", "Please select a department.")
             return
 
-        answer = messagebox.askyesno(
-
-            "Confirm Delete",
-
-            "Do you really want to delete this department?"
-
-        )
-
+        answer = messagebox.askyesno("Confirm Delete", "Do you really want to delete this department?")
         if not answer:
-
             return
-
-        success, message = DepartmentService.delete_department(
-
-            self.selected_department_id
-
-        )
+        success, message = DepartmentService.delete_department(self.selected_department_id)
 
         if success:
-
-            messagebox.showinfo(
-
-                "Success",
-
-                message
-
-            )
-
+            messagebox.showinfo("Success", message)
             self.load_departments()
-
             self.clear_form()
-
         else:
-
-            messagebox.showwarning(
-
-                "Department",
-
-                message
-
-            )
+            messagebox.showwarning("Department", message)
 
     # ==========================================================
     # CLEAR FORM
@@ -799,63 +531,17 @@ class DepartmentWindow:
     def clear_form(self):
 
         self.selected_department_id = None
-
-        self.code_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
-        self.name_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
-        self.hod_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
-        self.description_entry.delete(
-
-            0,
-
-            tk.END
-
-        )
-
+        self.code_entry.delete(0, tk.END)
+        self.name_entry.delete(0, tk.END)
+        self.hod_entry.delete(0, tk.END)
+        self.description_entry.delete(0, tk.END)
         for item in self.tree.selection():
-
             self.tree.selection_remove(item)
-
-        self.save_button.configure(
-
-            state="normal"
-
-        )
-
-        self.update_button.configure(
-
-            state="disabled"
-
-        )
-
-        self.delete_button.configure(
-
-            state="disabled"
-
-        )
-
+        self.save_button.configure(state="normal")
+        self.update_button.configure(state="disabled")
+        self.delete_button.configure(state="disabled")
         self.code_entry.focus()
-        self.load_next_department_code()
+        #self.load_next_department_code()
     
     
     # ==========================================================

@@ -18,7 +18,9 @@ from app.services.department_service import DepartmentService
 from app.ui.faculty_subject_assignment.faculty_subject_assignment_window import (
     FacultySubjectAssignmentWindow
 )
-
+from tkinter import filedialog
+from app.utils.faculty_template import FacultyTemplate
+from app.utils.excel_importer import ExcelImporter
 
 
 class FacultyWindow:
@@ -930,7 +932,7 @@ class FacultyWindow:
             sticky="ew"
 
         )
-                # =====================================================
+        # =====================================================
         # BUTTON FRAME
         # =====================================================
 
@@ -953,14 +955,72 @@ class FacultyWindow:
             pady=10
 
         )
+        self.download_template_button = ctk.CTkButton(
 
+            button_frame,
+
+            text="Download Template",
+
+            width=130,
+
+            command=self.download_template
+
+        )
+
+        self.download_template_button.pack(
+
+            side="left",
+
+            padx=5
+
+        )
+
+        self.import_button = ctk.CTkButton(
+
+            button_frame,
+
+            text="Import Excel",
+
+            width=120,
+
+            command=self.import_excel
+
+        )
+
+        self.import_button.pack(
+
+            side="left",
+
+            padx=5
+
+        )
+
+        self.export_button = ctk.CTkButton(
+
+            button_frame,
+
+            text="Export Excel",
+
+            width=120,
+
+            command=self.export_excel
+
+        )
+
+        self.export_button.pack(
+
+            side="left",
+
+            padx=5
+
+        )
         self.save_button = ctk.CTkButton(
 
             button_frame,
 
             text="Save",
 
-            width=120,
+            width=110,
 
             command=self.save_faculty
 
@@ -980,7 +1040,7 @@ class FacultyWindow:
 
             text="Update",
 
-            width=120,
+            width=110,
 
             command=self.update_faculty
 
@@ -1000,7 +1060,7 @@ class FacultyWindow:
 
             text="Delete",
 
-            width=120,
+            width=110,
 
             command=self.delete_faculty
 
@@ -1020,7 +1080,7 @@ class FacultyWindow:
 
             text="Clear",
 
-            width=120,
+            width=110,
 
             command=self.clear_form
 
@@ -1037,9 +1097,9 @@ class FacultyWindow:
 
             button_frame,
 
-            text="Subject Assignment",
+            text="Subject Allocation",
 
-            width=170,
+            width=150,
 
             command=self.open_subject_assignment
 
@@ -2176,11 +2236,140 @@ class FacultyWindow:
 
             )
     # ==========================================================
-    # SUBJECT ASSIGNMENT
+    # SUBJECT ALLOCATION
     # ==========================================================
+    # ==========================================================
+    # DOWNLOAD TEMPLATE
+    # ==========================================================
+
+    def download_template(self):
+
+        filename = filedialog.asksaveasfilename(
+
+            title="Save Faculty Template",
+
+            defaultextension=".xlsx",
+
+            filetypes=[
+
+                ("Excel Workbook", "*.xlsx")
+
+            ],
+
+            initialfile="Faculty_Template.xlsx"
+
+        )
+
+        if not filename:
+
+            return
+
+        try:
+
+            FacultyTemplate.create(
+
+                filename
+
+            )
+
+            messagebox.showinfo(
+
+                "FacultyERP",
+
+                "Faculty template downloaded successfully."
+
+            )
+
+        except Exception as error:
+
+            messagebox.showerror(
+
+                "FacultyERP",
+
+                str(error)
+
+            )
+
+    def import_excel(self):
+        filepath = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])
+        if not filepath:
+            return
+        headers = [
+            "Employee Code",
+            "First Name",
+            "Middle Name",
+            "Last Name",
+            "Department",
+            "Designation",
+            "Mobile",
+            "Email",
+            "Gender",
+            "Qualification",
+            "Experience",
+            "Joining Date",
+            "Employment Type",
+            "Specialization"
+        ]
+        mandatory_columns = [
+            "Employee Code",
+            "First Name",
+            "Last Name",
+            "Department",
+            "Designation"
+        ]
+        result = ExcelImporter.import_excel(
+            filepath=filepath,
+            headers=headers,
+            mandatory_columns=mandatory_columns
+        )
+        if result.success:
+            for record in result.records:
+                errors = FacultyService.validate_import_row(record)
+                if errors:
+                    result.valid_rows -= 1
+                    result.invalid_rows += 1
+                    result.add_error(record.get("Row", ""), "; ".join(errors))
+            if result.invalid_rows == 0:
+                for record in result.records:
+                    FacultyService.import_faculty(record)
+                messagebox.showinfo(
+                    "Import Successful",
+                    f"Faculty imported successfully.\n\n"
+                    f"Total Rows : {result.total_rows}\n"
+                    f"Imported : {result.valid_rows}"
+                )
+                self.load_faculty()
+            else:
+                error_text = ""
+                for error in result.errors[:10]:
+                    error_text += f"Row {error['row']}: {error['message']}\n"
+                if len(result.errors) > 10:
+                    error_text += f"\n...and {len(result.errors)-10} more errors."
+                messagebox.showerror("Import Validation Failed", error_text)
+        else:
+            error_text = ""
+            for error in result.errors[:10]:
+                error_text += f"Row {error['row']}: {error['message']}\n"
+            if len(result.errors) > 10:
+                error_text += f"\n...and {len(result.errors)-10} more errors."
+            messagebox.showerror("Import Validation Failed", error_text)
+
+    def export_excel(self):
+
+        messagebox.showinfo(
+
+            "FacultyERP",
+
+            "Faculty Excel Export will be implemented in the next step."
+
+        )
 
     def open_subject_assignment(self):
 
-        FacultySubjectAssignmentWindow(
+        from app.ui.faculty.faculty_subject_allocation_window import (
+            FacultySubjectAllocationWindow
+        )
+
+        FacultySubjectAllocationWindow(
             self.parent
         )

@@ -139,7 +139,7 @@ class CourseWindow:
 
             form,
 
-            text="Course Code"
+            text="Course ID"
 
         ).grid(
 
@@ -735,7 +735,7 @@ class CourseWindow:
 
             "ID",
 
-            "Course Code",
+            "Course ID",
 
             "Course Name",
 
@@ -785,7 +785,7 @@ class CourseWindow:
 
         self.tree.column(
 
-            "Course Code",
+            "Course ID",
 
             width=120,
 
@@ -918,17 +918,11 @@ class CourseWindow:
     # ==========================================================
 
     def generate_course_name(self, value=None):
-
         department_name = self.department_combo.get().strip()
-
         degree = self.degree_combo.get().strip()
-
         if department_name == "" or degree == "":
-
             return
-
         course_name = f"{degree} {department_name}"
-
         self.name_entry.delete(
             0,
             tk.END
@@ -943,17 +937,20 @@ class CourseWindow:
         # Generate Short Name
         #
 
-        words = department_name.split()
+        department = DepartmentService.get_department_by_name(
+            department_name
+        )
 
-        short_name = degree
+        if department:
 
-        for word in words:
+            short_name = (
+                degree +
+                department.department_code
+            )
 
-            if word.upper() in ("AND", "&"):
+        else:
 
-                continue
-
-            short_name += word[0].upper()
+            short_name = degree
 
         self.short_name_entry.delete(
             0,
@@ -986,21 +983,28 @@ class CourseWindow:
                 department.department_name
             ] = department.department_id
 
+        department_names.insert(
+            0,
+            "Select Department"
+        )
+
         self.department_combo.configure(
             values=department_names
         )
 
-        if department_names:
+        self.department_combo.set(
+            "Select Department"
+        )
 
-            self.department_combo.set(
-                department_names[0]
-            )
+        self.name_entry.delete(
+            0,
+            tk.END
+        )
 
-            #
-            # Generate default course name
-            #
-
-            self.generate_course_name()
+        self.short_name_entry.delete(
+            0,
+            tk.END
+        )
 
     # ==========================================================
     # LOAD COURSES

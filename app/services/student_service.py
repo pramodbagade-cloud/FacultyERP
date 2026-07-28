@@ -144,11 +144,74 @@ class StudentService:
             division_id=division_id,
             is_active=is_active
         )
-
+        
         StudentRepository.add(student)
 
         return True, "Student added successfully."
-        # ==========================================================
+
+    # ==========================================================
+    # IMPORT STUDENT
+    # ==========================================================
+
+    @staticmethod
+    def import_student(student_data,
+                       admission_year,
+                       academic_year_id,
+                       department_id,
+                       course_id,
+                       semester_id,
+                       division_id):
+
+        return StudentService.add_student(
+
+            first_name=student_data["first_name"],
+
+            last_name=student_data["last_name"],
+
+            admission_year=admission_year,
+
+            academic_year_id=academic_year_id,
+
+            department_id=department_id,
+
+            course_id=course_id,
+
+            semester_id=semester_id,
+
+            division_id=division_id,
+
+            prn=student_data["prn"],
+
+            mobile=student_data["mobile"],
+
+            email=student_data["email"],
+
+            middle_name=student_data["middle_name"],
+
+            gender=student_data["gender"],
+
+            date_of_birth=student_data["date_of_birth"],
+
+            parent_name=student_data["parent_name"],
+
+            parent_mobile=student_data["parent_mobile"],
+
+            parent_email=student_data["parent_email"],
+
+            permanent_address=student_data["permanent_address"],
+
+            local_address=student_data["local_address"],
+
+            emergency_contact_name=student_data["emergency_contact_name"],
+
+            emergency_contact_number=student_data["emergency_contact_number"],
+
+            photo=None,
+
+            is_active=True
+
+        )
+    # ==========================================================
     # UPDATE STUDENT
     # ==========================================================
 
@@ -201,11 +264,9 @@ class StudentService:
             return False, "Student not found."
 
         academic_year = AcademicYearRepository.get_by_id(academic_year_id)
-
         department = DepartmentRepository.get_by_id(department_id)
-
         course = CourseRepository.get_by_id(course_id)
-
+        semester = SemesterRepository.get_by_id(semester_id)
         division = DivisionRepository.get_by_id(division_id)
 
         if academic_year is None:
@@ -297,6 +358,24 @@ class StudentService:
 
         return StudentRepository.get_all()
 
+        # ==========================================================
+    # GET EXISTING IMPORT DATA
+    # ==========================================================
+
+    @staticmethod
+    def get_existing_import_data():
+
+        return StudentRepository.get_existing_import_data()
+
+    # ==========================================================
+    # GET EXISTING IMPORT DATA
+    # ==========================================================
+
+    @staticmethod
+    def get_existing_import_data():
+
+        return StudentRepository.get_existing_import_data()
+
     # ==========================================================
     # STUDENT EXISTS
     # ==========================================================
@@ -353,7 +432,7 @@ class StudentService:
 
         course_code = getattr(
             course,
-            "course_code",
+            "degree",
             None
         )
 
@@ -371,6 +450,11 @@ class StudentService:
 
         if not division_name:
             raise ValueError("Division name is not available.")
+        
+        print("Department :", department_code)
+        print("Course     :", course_code)
+        print("Division   :", division_name)
+        print("Roll No    :", roll_no)
 
         return IDGeneratorService.generate_student_college_id(
             admission_year=admission_year,
@@ -379,6 +463,18 @@ class StudentService:
             division_name=division_name,
             roll_no=roll_no
         )
+
+        college_id = IDGeneratorService.generate_student_college_id(
+            admission_year=admission_year,
+            department_code=department_code,
+            course_code=course_code,
+            division_name=division_name,
+            roll_no=roll_no
+        )
+
+        print("Generated College ID :", college_id)
+
+        return college_id
         # ==========================================================
     # VALIDATE STUDENT
     # ==========================================================

@@ -1,0 +1,68 @@
+# ==========================================================
+# FacultyERP - Git Ignore
+# ==========================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build & Distribution
+build/
+dist/
+*.egg-info/
+
+# Installer Output
+output/
+release/
+
+# Logs
+logs/
+*.log
+
+# Database (Local Development)
+database/*.db
+*.sqlite
+*.sqlite3
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Office Temporary Files
+~$*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Test & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python Cache
+*.pyo
+*.pyd
+
+# Environment Files
+.env
+.env.*
+
+# Temporary Files
+*.tmp
+*.bak

@@ -32,6 +32,17 @@ class Faculty:
     email: str = ""
 
     address: str = ""
+    pan_card_no: str = ""
+    aadhaar_number: str = ""
+    blood_group: str = ""
+    marital_status: str = ""
+    bank_account_number: str = ""
+    ifsc_code: str = ""
+    uan_number: str = ""
+    passport_number: str = ""
+    joining_department_date: str = ""
+    university_approval_number: str = ""
+    university_approval_date: str = ""
 
     department_id: int = 0
 

@@ -22,22 +22,45 @@ class IDGeneratorService:
     ):
         """
         Format:
-        26MEBEA015
+        26BEMEA015
 
         26  -> Admission Year
+        BE  -> Course Short Name
         ME  -> Department Code
-        BE  -> Course Code
         A   -> Division
         015 -> Roll Number
         """
 
         year = str(admission_year)[-2:]
-        department = str(department_code).upper().strip()
-        course = str(course_code).upper().strip()
-        division = str(division_name).upper().strip()
-        roll = IDGeneratorService.format_number(int(roll_no), 3)
 
-        return f"{year}{department}{course}{division}{roll}"
+        department = str(
+            department_code
+        ).upper().strip()
+
+        course = str(
+            course_code
+        ).upper().strip()
+
+        division = str(
+            division_name
+        ).upper().strip()
+
+        if "-" in division:
+
+            division = division.split("-")[-1]
+
+        roll = IDGeneratorService.format_number(
+            int(roll_no),
+            3
+        )
+
+        return (
+            f"{year}"
+            f"{course}"
+            f"{department}"
+            f"{division}"
+            f"{roll}"
+        )
 
     @staticmethod
     def generate_faculty_code(faculty_id):
