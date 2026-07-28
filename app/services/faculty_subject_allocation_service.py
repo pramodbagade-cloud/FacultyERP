@@ -5,22 +5,50 @@ Faculty Subject Allocation Service
 """
 
 from app.models.faculty_subject_allocation import FacultySubjectAllocation
-
-from app.repositories.faculty_subject_allocation_repository import (
-    FacultySubjectAllocationRepository
-)
-
-from app.repositories.faculty_repository import FacultyRepository
-from app.repositories.subject_repository import SubjectRepository
-from app.repositories.academic_year_repository import AcademicYearRepository
-from app.repositories.division_repository import DivisionRepository
+from app.repositories.faculty_subject_allocation_repository import FacultySubjectAllocationRepository
 
 
 class FacultySubjectAllocationService:
     """Business logic for Faculty Subject Allocation."""
 
     @staticmethod
-    def add_allocation(
+    def _calculate_workload(theory_hours, practical_hours, tutorial_hours):
+        return theory_hours + practical_hours + tutorial_hours
+
+    @staticmethod
+    def _validate(
+        faculty_id,
+        subject_id,
+        academic_year_id,
+        division_id,
+        batch_name,
+        theory_hours,
+        practical_hours,
+        tutorial_hours,
+        display_order
+    ):
+        if not faculty_id:
+            raise ValueError("Please select Faculty.")
+        if not subject_id:
+            raise ValueError("Please select Subject.")
+        if not academic_year_id:
+            raise ValueError("Please select Academic Year.")
+        if not division_id:
+            raise ValueError("Please select Division.")
+        if batch_name is None or str(batch_name).strip() == "":
+            batch_name = "Full"
+        if theory_hours < 0:
+            raise ValueError("Theory Hours cannot be negative.")
+        if practical_hours < 0:
+            raise ValueError("Practical Hours cannot be negative.")
+        if tutorial_hours < 0:
+            raise ValueError("Tutorial Hours cannot be negative.")
+        if display_order < 1:
+            display_order = 1
+        return batch_name, display_order
+
+    @staticmethod
+    def add(
         faculty_id,
         subject_id,
         academic_year_id,
@@ -33,58 +61,32 @@ class FacultySubjectAllocationService:
         display_order,
         remarks
     ):
-                # ==========================================================
-        # VALIDATION
-        # ==========================================================
-
-        if not faculty_id:
-            raise ValueError("Please select Faculty.")
-
-        if not subject_id:
-            raise ValueError("Please select Subject.")
-
-        if not academic_year_id:
-            raise ValueError("Please select Academic Year.")
-
-        if not division_id:
-            raise ValueError("Please select Division.")
-
-        if theory_hours < 0:
-            raise ValueError("Theory hours cannot be negative.")
-
-        if practical_hours < 0:
-            raise ValueError("Practical hours cannot be negative.")
-
-        if tutorial_hours < 0:
-            raise ValueError("Tutorial hours cannot be negative.")
-
-        if display_order < 1:
-            display_order = 1
-                    # ==========================================================
-        # VERIFY MASTER RECORDS
-        # ==========================================================
-
-        if FacultyRepository.get_by_id(faculty_id) is None:
-            raise ValueError("Selected faculty does not exist.")
-
-        if SubjectRepository.get_by_id(subject_id) is None:
-            raise ValueError("Selected subject does not exist.")
-
-        if AcademicYearRepository.get_by_id(academic_year_id) is None:
-            raise ValueError("Selected Academic Year does not exist.")
-
-        if DivisionRepository.get_by_id(division_id) is None:
-            raise ValueError("Selected Division does not exist.")
-                # ==========================================================
-        # WORKLOAD CALCULATION
-        # ==========================================================
-
-        workload_hours = (
-            theory_hours +
-            practical_hours +
+        batch_name, display_order = FacultySubjectAllocationService._validate(
+            faculty_id,
+            subject_id,
+            academic_year_id,
+            division_id,
+            batch_name,
+            theory_hours,
+            practical_hours,
+            tutorial_hours,
+            display_order
+        )
+        if FacultySubjectAllocationRepository.exists(
+            faculty_id,
+            subject_id,
+            academic_year_id,
+            division_id,
+            batch_name
+        ):
+            raise ValueError(
+                "This Faculty-Subject allocation already exists."
+            )
+        workload_hours = FacultySubjectAllocationService._calculate_workload(
+            theory_hours,
+            practical_hours,
             tutorial_hours
         )
-
         allocation = FacultySubjectAllocation(
             faculty_id=faculty_id,
             subject_id=subject_id,
@@ -102,4 +104,103 @@ class FacultySubjectAllocationService:
         )
 
         return FacultySubjectAllocationRepository.add(allocation)
+    @staticmethod
+    def update(
+        allocation_id,
+        faculty_id,
+        subject_id,
+        academic_year_id,
+        division_id,
+        batch_name,
+        theory_hours,
+        practical_hours,
+        tutorial_hours,
+        is_class_teacher,
+        display_order,
+        remarks,
+        is_active=1
+    ):
+        batch_name, display_order = FacultySubjectAllocationService._validate(
+            faculty_id,
+            subject_id,
+            academic_year_id,
+            division_id,
+            batch_name,
+            theory_hours,
+            practical_hours,
+            tutorial_hours,
+            display_order
+        )
+        if FacultySubjectAllocationRepository.exists_for_update(
+            allocation_id,
+            faculty_id,
+            subject_id,
+            academic_year_id,
+            division_id,
+            batch_name
+        ):
+            raise ValueError(
+                "This Faculty-Subject allocation already exists."
+            )
+        workload_hours = FacultySubjectAllocationService._calculate_workload(
+            theory_hours,
+            practical_hours,
+            tutorial_hours
+        )
+        allocation = FacultySubjectAllocation(
+            allocation_id=allocation_id,
+            faculty_id=faculty_id,
+            subject_id=subject_id,
+            academic_year_id=academic_year_id,
+            division_id=division_id,
+            batch_name=batch_name,
+            theory_hours=theory_hours,
+            practical_hours=practical_hours,
+            tutorial_hours=tutorial_hours,
+            workload_hours=workload_hours,
+            is_class_teacher=is_class_teacher,
+            display_order=display_order,
+            remarks=remarks,
+            is_active=is_active
+        )
+        FacultySubjectAllocationRepository.update(allocation)
+
+    @staticmethod
+    def delete(allocation_id):
+        FacultySubjectAllocationRepository.delete(allocation_id)
+
+    @staticmethod
+    def get_all():
+        return FacultySubjectAllocationRepository.get_all()
+
+    @staticmethod
+    def get_by_id(allocation_id):
+        return FacultySubjectAllocationRepository.get_by_id(allocation_id)
+
+    @staticmethod
+    def get_grid_data():
+        return FacultySubjectAllocationRepository.get_grid_data()
+
+    @staticmethod
+    def get_by_division(academic_year_id, division_id):
+        return FacultySubjectAllocationRepository.get_by_division(
+            academic_year_id,
+            division_id
+        )
+
+    @staticmethod
+    def get_by_faculty(faculty_id):
+        return FacultySubjectAllocationRepository.get_by_faculty(
+            faculty_id
+        )
+
+    @staticmethod
+    def get_faculty_workload(
+        faculty_id,
+        academic_year_id
+    ):
+        return FacultySubjectAllocationRepository.get_faculty_workload(
+            faculty_id,
+            academic_year_id
+        )
     

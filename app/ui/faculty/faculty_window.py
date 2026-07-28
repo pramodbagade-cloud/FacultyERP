@@ -2303,6 +2303,7 @@ class FacultyWindow:
             "Designation",
             "Mobile",
             "Email",
+            "PAN Card No",
             "Gender",
             "Qualification",
             "Experience",
@@ -2310,12 +2311,14 @@ class FacultyWindow:
             "Employment Type",
             "Specialization"
         ]
+
         mandatory_columns = [
             "Employee Code",
             "First Name",
             "Last Name",
             "Department",
-            "Designation"
+            "Designation",
+            "PAN Card No"
         ]
         result = ExcelImporter.import_excel(
             filepath=filepath,

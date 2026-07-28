@@ -25,6 +25,7 @@ from app.ui.settings.settings_page import SettingsWindow
 from app.ui.faculty.faculty_window import FacultyWindow
 from app.ui.user.user_window import UserWindow
 from app.ui.semester.semester_window import SemesterWindow
+from app.ui.faculty_subject_allocation.faculty_subject_allocation_window import FacultySubjectAllocationWindow
 
 
 
@@ -317,7 +318,7 @@ class DashboardWindow:
             anchor="w",
             font=self.section_font,
             fg_color="gray30",
-            command=self.open_teaching
+            command=self.toggle_academics
         )
 
         self.academics_header.pack(fill="x",padx=10,pady=(6,0))
@@ -327,6 +328,7 @@ class DashboardWindow:
             fg_color="transparent"
         )
 
+
         self.btn_course=ctk.CTkButton(
             self.academics_frame,
             text="Courses (Temporary)",
@@ -334,6 +336,14 @@ class DashboardWindow:
             command=self.open_courses
         )
         self.btn_course.pack(fill="x",pady=2)
+
+        self.btn_faculty_subject_allocation=ctk.CTkButton(
+            self.academics_frame,
+            text="Faculty Subject Allocation",
+            anchor="w",
+            command=self.open_faculty_subject_allocation
+        )
+        self.btn_faculty_subject_allocation.pack(fill="x",pady=2)
 
         self.btn_timetable=ctk.CTkButton(
             self.academics_frame,
@@ -1094,10 +1104,10 @@ class DashboardWindow:
 
         if self.academics_expanded:
             self.academics_frame.pack_forget()
-            self.academics_header.configure(text="▶ Academics")
+            self.academics_header.configure(text="▶ My Teaching")
         else:
             self.academics_frame.pack(fill="x",padx=20,pady=5)
-            self.academics_header.configure(text="▼ Academics")
+            self.academics_header.configure(text="▼ My Teaching")
 
         self.academics_expanded=not self.academics_expanded
 
@@ -1199,6 +1209,18 @@ class DashboardWindow:
     def open_courses(self):
         self.clear_workspace()
         CourseWindow(self.workspace)
+            
+    # =====================================================
+    # FACULTY SUBJECT ALLOCATION
+    # =====================================================
+
+    def open_faculty_subject_allocation(self):
+
+        self.clear_workspace()
+
+        FacultySubjectAllocationWindow(
+            self.workspace
+        )
 
     # =====================================================
     # OPEN SUBJECTS

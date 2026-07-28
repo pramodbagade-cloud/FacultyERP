@@ -23,7 +23,9 @@ class DivisionRepository:
             """
             INSERT INTO divisions
             (
+                division_code,
                 division_name,
+                department_id,
                 course_id,
                 academic_year_id,
                 semester_id,
@@ -32,11 +34,14 @@ class DivisionRepository:
             )
             VALUES
             (
-                ?, ?, ?, ?, ?, ?
+            
+                ?, ?, ?, ?, ?, ?, ?, ?
             )
             """,
             (
+                division.division_code,
                 division.division_name,
+                division.department_id,
                 division.course_id,
                 division.academic_year_id,
                 division.semester_id,
@@ -57,6 +62,8 @@ class DivisionRepository:
             """
             SELECT
                 d.division_id,
+                d.division_code,
+                d.department_id,
                 d.division_name,
                 d.course_id,
                 c.course_name,
@@ -85,7 +92,9 @@ class DivisionRepository:
         for row in rows:
             division=Division(
                 division_id=row["division_id"],
+                division_code=row["division_code"],
                 division_name=row["division_name"],
+                department_id=row["department_id"],
                 course_id=row["course_id"],
                 academic_year_id=row["academic_year_id"],
                 semester_id=row["semester_id"],
@@ -138,9 +147,12 @@ class DivisionRepository:
         for row in rows:
 
             divisions.append(
+          
                 Division(
                     division_id=row["division_id"],
+                    division_code=row["division_code"],
                     division_name=row["division_name"],
+                    department_id=row["department_id"],
                     course_id=row["course_id"],
                     academic_year_id=row["academic_year_id"],
                     semester_id=row["semester_id"],
@@ -173,7 +185,9 @@ class DivisionRepository:
             return None
         return Division(
             division_id=row["division_id"],
+            division_code=row["division_code"],
             division_name=row["division_name"],
+            department_id=row["department_id"],
             course_id=row["course_id"],
             academic_year_id=row["academic_year_id"],
             semester_id=row["semester_id"],
@@ -194,7 +208,9 @@ class DivisionRepository:
             """
             UPDATE divisions
             SET
+                division_code=?,
                 division_name=?,
+                department_id=?,
                 course_id=?,
                 academic_year_id=?,
                 semester_id=?,
@@ -203,7 +219,9 @@ class DivisionRepository:
             WHERE division_id=?
             """,
             (
+                division.division_code,
                 division.division_name,
+                division.department_id,
                 division.course_id,
                 division.academic_year_id,
                 division.semester_id,
@@ -234,6 +252,29 @@ class DivisionRepository:
         )
 
         conn.commit()
+    
+    # ==========================================================
+    # GENERATE DIVISION CODE
+    # ==========================================================
+
+    @staticmethod
+    def generate_division_code():
+        conn=DatabaseManager.get_connection()
+        cursor=conn.cursor()
+        cursor.execute(
+            """
+            SELECT division_code
+            FROM divisions
+            ORDER BY division_id DESC
+            LIMIT 1
+            """
+        )
+        row=cursor.fetchone()
+        if row is None or row["division_code"] is None:
+            return "DIV0001"
+        last_code=row["division_code"]
+        number=int(last_code.replace("DIV",""))+1
+        return f"DIV{number:04d}"
 
     # ==========================================================
     # EXISTS
@@ -262,6 +303,40 @@ class DivisionRepository:
                 academic_year_id,
                 semester_id,
                 division_name
+            )
+        )
+        return cursor.fetchone() is not None
+    # ==========================================================
+    # EXISTS FOR UPDATE
+    # ==========================================================
+
+    @staticmethod
+    def exists_for_update(
+            division_id,
+            course_id,
+            academic_year_id,
+            semester_id,
+            division_name
+    ):
+        conn=DatabaseManager.get_connection()
+        cursor=conn.cursor()
+        cursor.execute(
+            """
+            SELECT division_id
+            FROM divisions
+            WHERE
+                course_id=?
+                AND academic_year_id=?
+                AND semester_id=?
+                AND division_name=?
+                AND division_id<>?
+            """,
+            (
+                course_id,
+                academic_year_id,
+                semester_id,
+                division_name,
+                division_id
             )
         )
         return cursor.fetchone() is not None

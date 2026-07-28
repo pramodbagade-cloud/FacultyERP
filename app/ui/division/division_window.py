@@ -12,6 +12,7 @@ from app.services.division_service import DivisionService
 from app.services.course_service import CourseService
 from app.services.academic_year_service import AcademicYearService
 from app.services.semester_service import SemesterService
+from app.services.department_service import DepartmentService
 
 
 class DivisionWindow:
@@ -20,6 +21,7 @@ class DivisionWindow:
 
         self.parent=parent
         self.selected_division_id=None
+        self.selected_division_code=""
         self.build_ui()
         self.initialize()
 
@@ -31,6 +33,7 @@ class DivisionWindow:
 
         self.update_button.configure(state="disabled")
         self.delete_button.configure(state="disabled")
+        self.load_departments()
         self.load_courses()
         self.load_academic_years()
         self.load_semesters()
@@ -90,9 +93,34 @@ class DivisionWindow:
             sticky="ew"
         )
 
-        ctk.CTkLabel(form,text="Course").grid(
+        ctk.CTkLabel(form,text="Department").grid(
             row=1,
             column=0,
+            padx=10,
+            pady=10,
+            sticky="w"
+        )
+
+        self.department_combo=ctk.CTkComboBox(
+            form,
+            values=[],
+            state="readonly"
+        )
+
+        self.department_combo.grid(
+            row=1,
+            column=1,
+            padx=10,
+            pady=10,
+            sticky="ew"
+        )
+        self.department_combo.configure(
+            command=self.on_department_changed
+        )
+
+        ctk.CTkLabel(form,text="Course").grid(
+            row=1,
+            column=2,
             padx=10,
             pady=10,
             sticky="w"
@@ -106,15 +134,15 @@ class DivisionWindow:
 
         self.course_combo.grid(
             row=1,
-            column=1,
+            column=3,
             padx=10,
             pady=10,
             sticky="ew"
         )
 
         ctk.CTkLabel(form,text="Academic Year").grid(
-            row=1,
-            column=2,
+            row=2,
+            column=0,
             padx=10,
             pady=10,
             sticky="w"
@@ -127,15 +155,15 @@ class DivisionWindow:
         )
 
         self.academic_year_combo.grid(
-            row=1,
-            column=3,
+            row=2,
+            column=1,
             padx=10,
             pady=10,
             sticky="ew"
         )
         ctk.CTkLabel(form,text="Semester").grid(
             row=2,
-            column=0,
+            column=2,
             padx=10,
             pady=10,
             sticky="w"
@@ -147,23 +175,23 @@ class DivisionWindow:
         )
         self.semester_combo.grid(
             row=2,
-            column=1,
+            column=3,
             padx=10,
             pady=10,
             sticky="ew"
         )
 
         ctk.CTkLabel(form,text="Intake").grid(
-            row=2,
-            column=2,
+            row=3,
+            column=0,
             padx=10,
             pady=10,
             sticky="w"
         )
         self.intake_entry=ctk.CTkEntry(form)
         self.intake_entry.grid(
-            row=2,
-            column=3,
+            row=3,
+            column=1,
             padx=10,
             pady=10,
             sticky="ew"
@@ -179,7 +207,7 @@ class DivisionWindow:
             offvalue=0
         )
         self.active_checkbox.grid(
-            row=3,
+            row=4,
             column=0,
             columnspan=2,
             padx=10,
@@ -290,13 +318,40 @@ class DivisionWindow:
             "<<TreeviewSelect>>",
             self.on_row_selected
         )
-            # ==========================================================
+    
+    # ==========================================================
+    # LOAD DEPARTMENTS
+    # ==========================================================
+
+    def load_departments(self):
+        departments=DepartmentService.get_departments()
+        values=[]
+        self.department_map={}
+        for department in departments:
+            values.append(department.department_name)
+            self.department_map[department.department_name]=department.department_id
+        self.department_combo.configure(values=values)
+        if values:
+            self.department_combo.set(values[0])
+
+    # ==========================================================
+    # DEPARTMENT CHANGED
+    # ==========================================================
+
+    def on_department_changed(self,value):
+        self.load_courses()
+            
+    # ==========================================================
     # LOAD COURSES
     # ==========================================================
 
     def load_courses(self):
 
-        courses=CourseService.get_courses()
+        department_name=self.department_combo.get()
+        department_id=self.department_map.get(department_name)
+        if department_id is None:
+            return
+        courses=CourseService.get_courses_by_department(department_id)
         values=[]
         self.course_map={}
         for course in courses:
@@ -393,6 +448,7 @@ class DivisionWindow:
 
     def clear_form(self):
         self.selected_division_id=None
+        self.selected_division_code=""
         self.name_entry.delete(0,"end")
         self.intake_entry.delete(0,"end")
         self.intake_entry.insert(0,"60")
@@ -423,6 +479,7 @@ class DivisionWindow:
             intake=int(intake)
             DivisionService.add_division(
                 name,
+                self.department_map[self.department_combo.get()],
                 self.course_map[self.course_combo.get()],
                 self.academic_year_map[self.academic_year_combo.get()],
                 self.semester_map[self.semester_combo.get()],
@@ -462,6 +519,12 @@ class DivisionWindow:
 
         if division is None:
             return
+        self.selected_division_code=division.division_code
+        for name,id in self.department_map.items():
+            if id==division.department_id:
+                self.department_combo.set(name)
+                self.load_courses()
+                break
 
         self.name_entry.delete(0,"end")
         self.name_entry.insert(0,division.division_name)
@@ -509,7 +572,9 @@ class DivisionWindow:
             intake=int(intake)
             DivisionService.update_division(
                 self.selected_division_id,
+                self.selected_division_code,
                 name,
+                self.department_map[self.department_combo.get()],
                 self.course_map[self.course_combo.get()],
                 self.academic_year_map[self.academic_year_combo.get()],
                 self.semester_map[self.semester_combo.get()],

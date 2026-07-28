@@ -242,13 +242,17 @@ class DatabaseSchema:
             CREATE TABLE IF NOT EXISTS divisions
             (
                 division_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                division_code TEXT UNIQUE NOT NULL,
                 division_name TEXT NOT NULL,
+                department_id INTEGER NOT NULL,
                 course_id INTEGER NOT NULL,
                 academic_year_id INTEGER NOT NULL,
                 semester_id INTEGER NOT NULL,
                 intake INTEGER NOT NULL DEFAULT 0,
                 is_active INTEGER NOT NULL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (department_id)
+                    REFERENCES departments(department_id),
                 FOREIGN KEY (course_id)
                     REFERENCES courses(course_id),
                 FOREIGN KEY (academic_year_id)
@@ -263,6 +267,7 @@ class DatabaseSchema:
                     division_name
                 )
             )
+
             """
         )
         # ==========================================================

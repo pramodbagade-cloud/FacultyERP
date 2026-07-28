@@ -4,6 +4,8 @@ Faculty Service
 ---------------
 """
 
+from xml.parsers.expat import errors
+
 from app.models.faculty import Faculty
 from app.repositories.faculty_repository import FacultyRepository
 from app.repositories.department_repository import DepartmentRepository
@@ -51,6 +53,9 @@ class FacultyService:
 
         if employee_code != "" and FacultyRepository.exists(employee_code):
             errors.append("Employee Code already exists.")
+
+        if pan_card_no != "" and FacultyRepository.exists_pan(pan_card_no):
+            errors.append("PAN Card Number already exists.")
 
         if department != "" and not DepartmentRepository.exists_by_name(department):
             errors.append("Invalid Department.")
@@ -221,6 +226,9 @@ class FacultyService:
 
         if FacultyRepository.exists(employee_code):
             return False, "Employee Code already exists."
+        
+        if FacultyRepository.exists_pan(pan_card_no):
+            return False, "PAN Card Number already exists."
 
         faculty_code = FacultyRepository.generate_faculty_code()
 
@@ -274,6 +282,10 @@ class FacultyService:
     @staticmethod
     def get_faculty():
         return FacultyRepository.get_all()
+    
+    @staticmethod
+    def get_faculty_by_department(department_id):
+        return FacultyRepository.get_by_department(department_id)
 
     # ==========================================================
     # GET FACULTY BY ID

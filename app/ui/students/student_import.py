@@ -5,7 +5,7 @@ Student Excel Import
 Handles bulk import of student records from Excel.
 """
 
-from pathlib import Path
+#from pathlib import Path
 import openpyxl
 from tkinter import filedialog
 from tkinter import messagebox
@@ -173,8 +173,13 @@ class StudentImport:
             return
 
         messagebox.showinfo(
-            "Import Successful",
-            f"{imported} student(s) imported successfully."
+            "FacultyERP",
+            (
+                "Student Import Completed Successfully.\n\n"
+                f"Total Records : {len(valid_students)}\n"
+                f"Imported      : {imported}\n"
+                f"Failed        : {failed}"
+            )
         )
     # ==========================================================
     # VALIDATE HEADERS

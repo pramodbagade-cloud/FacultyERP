@@ -18,6 +18,7 @@ class DivisionService:
     @staticmethod
     def add_division(
             division_name,
+            department_id,
             course_id,
             academic_year_id,
             semester_id,
@@ -27,6 +28,8 @@ class DivisionService:
         division_name=division_name.strip().upper()
         if division_name=="":
             raise ValueError("Division is required.")
+        if department_id is None:
+            raise ValueError("Please select Department.")
         if course_id is None:
             raise ValueError("Please select Course.")
         if academic_year_id is None:
@@ -42,8 +45,11 @@ class DivisionService:
             division_name
         ):
             raise ValueError("Division already exists.")
+
         division=Division(
+            division_code="",
             division_name=division_name,
+            department_id=department_id,
             course_id=course_id,
             academic_year_id=academic_year_id,
             semester_id=semester_id,
@@ -59,7 +65,9 @@ class DivisionService:
     @staticmethod
     def update_division(
             division_id,
+            division_code,
             division_name,
+            department_id,
             course_id,
             academic_year_id,
             semester_id,
@@ -69,6 +77,8 @@ class DivisionService:
         division_name=division_name.strip().upper()
         if division_name=="":
             raise ValueError("Division is required.")
+        if department_id is None:
+            raise ValueError("Please select Department.")
         if course_id is None:
             raise ValueError("Please select Course.")
         if academic_year_id is None:
@@ -77,9 +87,20 @@ class DivisionService:
             raise ValueError("Please select Semester.")
         if intake<=0:
             raise ValueError("Intake must be greater than zero.")
+        if DivisionRepository.exists_for_update(
+            division_id,
+            course_id,
+            academic_year_id,
+            semester_id,
+            division_name
+        ):
+            raise ValueError("Division already exists.")
+
         division=Division(
             division_id=division_id,
+            division_code=division_code,
             division_name=division_name,
+            department_id=department_id,
             course_id=course_id,
             academic_year_id=academic_year_id,
             semester_id=semester_id,

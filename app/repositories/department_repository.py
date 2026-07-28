@@ -241,45 +241,31 @@ class DepartmentRepository:
     # ==========================================================
     # GET BY NAME
     # ==========================================================
-
     @staticmethod
     def get_by_name(department_name):
-
-        conn = DatabaseManager.get_connection()
-
-        cursor = conn.cursor()
-
+        conn=DatabaseManager.get_connection()
+        cursor=conn.cursor()
+        value=department_name.strip()
         cursor.execute(
             """
             SELECT *
             FROM departments
-            WHERE department_name=?
+            WHERE UPPER(TRIM(department_name))=UPPER(TRIM(?))
+            OR UPPER(TRIM(department_code))=UPPER(TRIM(?))
             """,
-            (department_name,)
+            (value,value)
         )
-
-        row = cursor.fetchone()
-
+        row=cursor.fetchone()
         if row is None:
-
             return None
-
         return Department(
-
             department_id=row["department_id"],
-
             department_code=row["department_code"],
-
             department_name=row["department_name"],
-
             hod_name=row["hod_name"],
-
             description=row["description"],
-
             is_active=row["is_active"],
-
             created_at=row["created_at"]
-
         )
     # ==========================================================
     # GET ID BY NAME
