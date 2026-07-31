@@ -227,6 +227,26 @@ class SemesterRepository:
                 return semester_no
 
         return None
+    # ==========================================================
+    # EXISTS FOR UPDATE
+    # ==========================================================
+    @staticmethod
+    def exists_for_update(semester_no, semester_id):
+        conn = DatabaseManager.get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT semester_id
+            FROM semesters
+            WHERE semester_no=?
+            AND semester_id<>?
+            """,
+            (
+                semester_no,
+                semester_id
+            )
+        )
+        return cursor.fetchone() is not None
 
         
     

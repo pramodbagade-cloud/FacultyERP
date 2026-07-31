@@ -26,6 +26,8 @@ from app.ui.faculty.faculty_window import FacultyWindow
 from app.ui.user.user_window import UserWindow
 from app.ui.semester.semester_window import SemesterWindow
 from app.ui.faculty_subject_allocation.faculty_subject_allocation_window import FacultySubjectAllocationWindow
+from app.ui.batch_management.batch_management_window import BatchManagementWindow
+
 
 
 
@@ -344,6 +346,14 @@ class DashboardWindow:
             command=self.open_faculty_subject_allocation
         )
         self.btn_faculty_subject_allocation.pack(fill="x",pady=2)
+
+        self.btn_batch_management=ctk.CTkButton(
+            self.academics_frame,
+            text="Batch Management",
+            anchor="w",
+            command=self.open_batch_management
+        )
+        self.btn_batch_management.pack(fill="x",pady=2)
 
         self.btn_timetable=ctk.CTkButton(
             self.academics_frame,
@@ -1219,6 +1229,14 @@ class DashboardWindow:
         self.clear_workspace()
 
         FacultySubjectAllocationWindow(
+            self.workspace
+        )
+
+    def open_batch_management(self):
+
+        self.clear_workspace()
+
+        BatchManagementWindow(
             self.workspace
         )
 

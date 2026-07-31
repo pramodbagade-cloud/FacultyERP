@@ -7,20 +7,16 @@ Student Repository
 from app.core.database import DatabaseManager
 from app.models.student import Student
 
-
 class StudentRepository:
     """Database operations for Student."""
-
     # ==========================================================
     # ADD
     # ==========================================================
 
     @staticmethod
     def add(student: Student):
-
         conn = DatabaseManager.get_connection()
         cursor = conn.cursor()
-
         cursor.execute(
             """
             INSERT INTO students
@@ -102,21 +98,92 @@ class StudentRepository:
         cursor.execute(
             """
             SELECT
-
                 s.*,
-
                 ay.academic_year,
-
                 d.department_name,
-
                 c.course_name,
-
                 sem.semester_name,
-
                 div.division_name
-
             FROM students s
+            INNER JOIN academic_years ay
+                ON s.academic_year_id=ay.academic_year_id
+            INNER JOIN departments d
+                ON s.department_id=d.department_id
+            INNER JOIN courses c
+                ON s.course_id=c.course_id
+            INNER JOIN semesters sem
+                ON s.semester_id=sem.semester_id
+            INNER JOIN divisions div
+                ON s.division_id=div.division_id
+            ORDER BY
+                ay.academic_year,
+                d.department_name,
+                c.course_name,
+                sem.semester_no,
+                div.division_name,
+                s.roll_no
+            """
+        )
 
+        rows = cursor.fetchall()
+        students = []
+        for row in rows:
+                student = Student(
+                student_id=row["student_id"],
+                college_id=row["college_id"],
+                prn=row["prn"],
+                roll_no=row["roll_no"],
+                first_name=row["first_name"],
+                middle_name=row["middle_name"],
+                last_name=row["last_name"],
+                gender=row["gender"],
+                date_of_birth=row["date_of_birth"],
+                mobile=row["mobile"],
+                email=row["email"],
+                photo=row["photo"],
+                parent_name=row["parent_name"],
+                parent_mobile=row["parent_mobile"],
+                parent_email=row["parent_email"],
+                permanent_address=row["permanent_address"],
+                local_address=row["local_address"],
+                emergency_contact_name=row["emergency_contact_name"],
+                emergency_contact_number=row["emergency_contact_number"],
+                admission_year=row["admission_year"],
+                academic_year_id=row["academic_year_id"],
+                department_id=row["department_id"],
+                course_id=row["course_id"],
+                semester_id=row["semester_id"],
+                division_id=row["division_id"],
+                is_active=row["is_active"],
+                created_at=row["created_at"]
+            )
+
+                student.academic_year_name = row["academic_year"]
+                student.department_name = row["department_name"]
+                student.course_name = row["course_name"]
+                student.semester_name = row["semester_name"]
+                student.division_name = row["division_name"]
+                students.append(student)
+
+        return students
+    # ==========================================================
+    # GET BY DIVISION
+    # ==========================================================
+
+    @staticmethod
+    def get_by_division(division_id):
+        conn = DatabaseManager.get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT
+                s.*,
+                ay.academic_year,
+                d.department_name,
+                c.course_name,
+                sem.semester_name,
+                div.division_name
+            FROM students s
             INNER JOIN academic_years ay
                 ON s.academic_year_id=ay.academic_year_id
 
@@ -132,96 +199,53 @@ class StudentRepository:
             INNER JOIN divisions div
                 ON s.division_id=div.division_id
 
-            ORDER BY
+            WHERE s.division_id=?
+            AND s.is_active=1
 
-                ay.academic_year,
-
-                d.department_name,
-
-                c.course_name,
-
-                sem.semester_no,
-
-                div.division_name,
-
-                s.roll_no
-            """
+            ORDER BY CAST(s.roll_no AS INTEGER)
+            """,
+            (division_id,)
         )
-
         rows = cursor.fetchall()
-
         students = []
         for row in rows:
-
-                student = Student(
-
+            student = Student(
                 student_id=row["student_id"],
-
                 college_id=row["college_id"],
-
                 prn=row["prn"],
-
                 roll_no=row["roll_no"],
-
                 first_name=row["first_name"],
-
                 middle_name=row["middle_name"],
-
                 last_name=row["last_name"],
-
                 gender=row["gender"],
-
                 date_of_birth=row["date_of_birth"],
-
                 mobile=row["mobile"],
-
                 email=row["email"],
-
                 photo=row["photo"],
-
                 parent_name=row["parent_name"],
-
                 parent_mobile=row["parent_mobile"],
-
                 parent_email=row["parent_email"],
-
                 permanent_address=row["permanent_address"],
-
                 local_address=row["local_address"],
-
                 emergency_contact_name=row["emergency_contact_name"],
-
                 emergency_contact_number=row["emergency_contact_number"],
-
                 admission_year=row["admission_year"],
-
                 academic_year_id=row["academic_year_id"],
-
                 department_id=row["department_id"],
-
                 course_id=row["course_id"],
-
                 semester_id=row["semester_id"],
-
                 division_id=row["division_id"],
-
                 is_active=row["is_active"],
-
                 created_at=row["created_at"]
-
             )
 
-                student.academic_year_name = row["academic_year"]
+            student.academic_year_name = row["academic_year"]
+            student.department_name = row["department_name"]
+            student.course_name = row["course_name"]
+            student.semester_name = row["semester_name"]
+            student.division_name = row["division_name"]
 
-                student.department_name = row["department_name"]
-
-                student.course_name = row["course_name"]
-
-                student.semester_name = row["semester_name"]
-
-                student.division_name = row["division_name"]
-
-                students.append(student)
+            students.append(student)
 
         return students
 
@@ -231,11 +255,8 @@ class StudentRepository:
 
     @staticmethod
     def get_by_id(student_id):
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             SELECT
@@ -260,83 +281,45 @@ class StudentRepository:
             """,
             (student_id,)
         )
-
         row = cursor.fetchone()
-
         if row is None:
-
             return None
-
         student = Student(
-
             student_id=row["student_id"],
-
             college_id=row["college_id"],
-
             prn=row["prn"],
-
             roll_no=row["roll_no"],
-
             first_name=row["first_name"],
-
             middle_name=row["middle_name"],
-
             last_name=row["last_name"],
-
             gender=row["gender"],
-
             date_of_birth=row["date_of_birth"],
-
             mobile=row["mobile"],
-
             email=row["email"],
-
             photo=row["photo"],
-
             parent_name=row["parent_name"],
-
             parent_mobile=row["parent_mobile"],
-
             parent_email=row["parent_email"],
-
             permanent_address=row["permanent_address"],
-
             local_address=row["local_address"],
-
             emergency_contact_name=row["emergency_contact_name"],
-
             emergency_contact_number=row["emergency_contact_number"],
-
             admission_year=row["admission_year"],
-
             academic_year_id=row["academic_year_id"],
-
             department_id=row["department_id"],
-
             course_id=row["course_id"],
-
             semester_id=row["semester_id"],
-
             division_id=row["division_id"],
-
             is_active=row["is_active"],
-
             created_at=row["created_at"]
-
         )
-
         student.academic_year_name = row["academic_year"]
-
         student.department_name = row["department_name"]
-
         student.course_name = row["course_name"]
-
         student.semester_name = row["semester_name"]
-
         student.division_name = row["division_name"]
-
         return student
-        # ==========================================================
+    # ==========================================================
     # UPDATE
     # ==========================================================
 
@@ -344,9 +327,7 @@ class StudentRepository:
     def update(student: Student):
 
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             UPDATE students
@@ -416,11 +397,8 @@ class StudentRepository:
 
     @staticmethod
     def delete(student_id):
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             DELETE FROM students
@@ -428,21 +406,16 @@ class StudentRepository:
             """,
             (student_id,)
         )
-
         conn.commit()
-            # ==========================================================
+    # ==========================================================
     # EXISTS
     # ==========================================================
 
     @staticmethod
     def exists(college_id, prn, student_id=None):
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         if student_id is None:
-
             cursor.execute(
                 """
                 SELECT COUNT(*)
@@ -450,14 +423,9 @@ class StudentRepository:
                 WHERE college_id=?
                    OR (prn=? AND prn<>'')
                 """,
-                (
-                    college_id,
-                    prn
-                )
+                (college_id, prn)
             )
-
         else:
-
             cursor.execute(
                 """
                 SELECT COUNT(*)
@@ -469,36 +437,23 @@ class StudentRepository:
                 )
                 AND student_id<>?
                 """,
-                (
-                    college_id,
-                    prn,
-                    student_id
-                )
+                (college_id, prn, student_id)
             )
-
         return cursor.fetchone()[0] > 0
-
     # ==========================================================
     # GET NEXT ROLL NUMBER
     # ==========================================================
 
     @staticmethod
     def get_next_roll_no(
-
             academic_year_id,
-
             course_id,
-
             semester_id,
-
             division_id
-
     ):
 
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             SELECT MAX(CAST(roll_no AS INTEGER))
@@ -530,11 +485,8 @@ class StudentRepository:
 
     @staticmethod
     def get_by_college_id(college_id):
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             SELECT *
@@ -545,67 +497,36 @@ class StudentRepository:
         )
 
         row = cursor.fetchone()
-
         if row is None:
-
             return None
-
         return Student(
-
             student_id=row["student_id"],
-
             college_id=row["college_id"],
-
             prn=row["prn"],
-
             roll_no=row["roll_no"],
-
             first_name=row["first_name"],
-
             middle_name=row["middle_name"],
-
             last_name=row["last_name"],
-
             gender=row["gender"],
-
             date_of_birth=row["date_of_birth"],
-
             mobile=row["mobile"],
-
             email=row["email"],
-
             photo=row["photo"],
-
             parent_name=row["parent_name"],
-
             parent_mobile=row["parent_mobile"],
-
             parent_email=row["parent_email"],
-
             permanent_address=row["permanent_address"],
-
             local_address=row["local_address"],
-
             emergency_contact_name=row["emergency_contact_name"],
-
             emergency_contact_number=row["emergency_contact_number"],
-
             admission_year=row["admission_year"],
-
             academic_year_id=row["academic_year_id"],
-
             department_id=row["department_id"],
-
             course_id=row["course_id"],
-
             semester_id=row["semester_id"],
-
             division_id=row["division_id"],
-
             is_active=row["is_active"],
-
             created_at=row["created_at"]
-
         )
     # ==========================================================
     # GET EXISTING IMPORT DATA
@@ -613,20 +534,10 @@ class StudentRepository:
 
     @staticmethod
     def get_existing_import_data():
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
-        data = {
-            "mobiles": set(),
-            "emails": set(),
-            "prns": set(),
-            "aadhaars": set()
-        }
-
-        cursor.execute(
-            """
+        data = {"mobiles": set(), "emails": set(), "prns": set(), "aadhaars": set()}
+        cursor.execute(            """
             SELECT
                 mobile,
                 email,
@@ -639,30 +550,21 @@ class StudentRepository:
         rows = cursor.fetchall()
 
         for row in rows:
-
             if row["mobile"]:
-
                 data["mobiles"].add(
                     row["mobile"].strip()
                 )
-
             if row["email"]:
-
                 data["emails"].add(
                     row["email"].strip().lower()
                 )
-
             if row["prn"]:
-
                 data["prns"].add(
                     row["prn"].strip()
                 )
-
             if row["aadhaar_number"]:
-
                 data["aadhaars"].add(
                     row["aadhaar_number"].strip()
                 )
-
         return data
     

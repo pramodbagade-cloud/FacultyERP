@@ -320,7 +320,30 @@ class DatabaseSchema:
             )
             """
         )
-                # ==========================================================
+
+        # ==========================================================
+        # STUDENT BATCH ALLOCATIONS
+        # ==========================================================
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS student_batch_allocations
+            (
+                allocation_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id INTEGER NOT NULL,
+                batch_no INTEGER NOT NULL,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (student_id)
+                    REFERENCES students(student_id),
+                UNIQUE
+                (
+                    student_id
+                )
+            )
+            """
+        )
+        # ==========================================================
         # FACULTY SUBJECT ALLOCATIONS
         # ==========================================================
 

@@ -792,7 +792,8 @@ class StudentWindow:
 
             self.student_grid.heading(
                 column,
-                text=column
+                text=column,
+                command=lambda c=column: self.sort_student_grid(c, False)
             )
 
             self.student_grid.column(
@@ -1134,3 +1135,52 @@ class StudentWindow:
                 "FacultyERP",
                 "Unable to delete student."
             )
+
+    # ==========================================================
+    # SORT STUDENT GRID
+    # ==========================================================
+
+    def sort_student_grid(self, column, reverse):
+
+        data = []
+
+        for item in self.student_grid.get_children():
+
+            value = self.student_grid.set(
+                item,
+                column
+            )
+
+            if column == "Roll No":
+
+                try:
+                    value = int(value)
+                except:
+                    pass
+
+            data.append(
+                (
+                    value,
+                    item
+                )
+            )
+
+        data.sort(
+            reverse=reverse
+        )
+
+        for index, (_, item) in enumerate(data):
+
+            self.student_grid.move(
+                item,
+                "",
+                index
+            )
+
+        self.student_grid.heading(
+            column,
+            command=lambda: self.sort_student_grid(
+                column,
+                not reverse
+            )
+        )

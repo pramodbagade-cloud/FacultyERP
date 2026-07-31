@@ -68,7 +68,7 @@ class FacultySubjectAllocationWindow:
         self.subject_combo = None
         self.faculty_combo = None
 
-        self.batch_entry = None
+        self.batch_combo = None
         self.theory_hours_entry = None
         self.practical_hours_entry = None
         self.tutorial_hours_entry = None
@@ -383,18 +383,9 @@ class FacultySubjectAllocationWindow:
             sticky="w"
         )
 
-        self.batch_entry = ctk.CTkEntry(
-            self.left_frame,
-            textvariable=self.batch_var
-        )
-
-        self.batch_entry.grid(
-            row=2,
-            column=1,
-            padx=10,
-            pady=5,
-            sticky="ew"
-        )
+        self.batch_combo = ctk.CTkComboBox(self.left_frame, variable=self.batch_var, values=["Full", "Batch A", "Batch B", "Batch C"])
+        self.batch_combo.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
+        self.batch_combo.set("Full")
 
         ctk.CTkLabel(
             self.left_frame,
@@ -953,6 +944,7 @@ class FacultySubjectAllocationWindow:
 
         if values:
             self.subject_var.set(values[0])
+            self.on_subject_change()
         else:
             self.subject_var.set("")
             self.subject_combo.configure(values=[])
@@ -1156,6 +1148,23 @@ class FacultySubjectAllocationWindow:
             self.workload_var.set(str(int(total)))
         else:
             self.workload_var.set(f"{total:.1f}")
+
+
+    def on_subject_change(self):
+
+        subject_name = self.subject_var.get()
+
+        for subject in self.subjects:
+
+            if subject.subject_name == subject_name:
+
+                self.theory_hours_var.set(str(subject.theory_hours))
+                self.practical_hours_var.set(str(subject.practical_hours))
+                self.tutorial_hours_var.set(str(subject.tutorial_hours))
+
+                self.calculate_workload()
+
+                return
     
     # ==========================================================
     # TREE SELECTION
@@ -1569,6 +1578,11 @@ class FacultySubjectAllocationWindow:
         self.semester_combo.configure(
             command=lambda _:
             self.on_semester_change()
+        )
+
+        self.subject_combo.configure(
+            command=lambda _:
+            self.on_subject_change()
         )
 
         self.theory_hours_var.trace_add(

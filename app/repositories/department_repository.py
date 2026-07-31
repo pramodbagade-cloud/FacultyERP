@@ -13,11 +13,8 @@ class DepartmentRepository:
 
     @staticmethod
     def add(department: Department):
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             INSERT INTO departments
@@ -27,7 +24,6 @@ class DepartmentRepository:
                 hod_name,
                 description
             )
-
             VALUES (?,?,?,?)
             """,
             (
@@ -37,16 +33,11 @@ class DepartmentRepository:
                 department.description
             )
         )
-
         conn.commit()
-
     @staticmethod
     def get_all():
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             SELECT *
@@ -56,15 +47,10 @@ class DepartmentRepository:
         )
 
         rows = cursor.fetchall()
-
         departments = []
-
         for row in rows:
-
             departments.append(
-
                 Department(
-
                     department_id=row["department_id"],
                     department_code=row["department_code"],
                     department_name=row["department_name"],
@@ -72,11 +58,8 @@ class DepartmentRepository:
                     description=row["description"],
                     is_active=row["is_active"],
                     created_at=row["created_at"]
-
                 )
-
             )
-
         return departments
 
     @staticmethod
@@ -114,97 +97,57 @@ class DepartmentRepository:
 
     @staticmethod
     def update(department: Department):
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             UPDATE departments
-
             SET
-
                 department_code=?,
-
                 department_name=?,
-
                 hod_name=?,
-
                 description=?
-
             WHERE department_id=?
             """,
-
             (
-
                 department.department_code,
-
                 department.department_name,
-
                 department.hod_name,
-
                 department.description,
-
                 department.department_id
-
             )
-
         )
-
         conn.commit()
 
     @staticmethod
     def delete(department_id):
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
-
             """
             DELETE FROM departments
             WHERE department_id=?
             """,
-
             (department_id,)
-
         )
-
         conn.commit()
 
     @staticmethod
     def exists(code, name):
-
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
             """
             SELECT COUNT(*)
-
             FROM departments
-
             WHERE department_code=?
-
                OR department_name=?
             """,
-
-            (
-
-                code,
-
-                name
-
-            )
-
+            (code, name)
         )
-
         return cursor.fetchone()[0] > 0
     
-        # ==========================================================
+    # ==========================================================
     # NEXT DEPARTMENT CODE
     # ==========================================================
 
@@ -212,32 +155,20 @@ class DepartmentRepository:
     def get_next_department_code():
 
         conn = DatabaseManager.get_connection()
-
         cursor = conn.cursor()
-
         cursor.execute(
-
             """
-
             SELECT MAX(
-
                 CAST(department_code AS INTEGER)
-
             )
-
             FROM departments
-
             """
-
         )
-
         value = cursor.fetchone()[0]
-
         if value is None:
-
             return "01"
-
         return f"{value + 1:02d}"
+
     # ==========================================================
     # GET BY NAME
     # ==========================================================
@@ -273,13 +204,9 @@ class DepartmentRepository:
 
     @staticmethod
     def get_id_by_name(department_name):
-
         department = DepartmentRepository.get_by_name(department_name)
-
         if department is None:
-
             return None
-
         return department.department_id
 
     # ==========================================================
@@ -288,5 +215,4 @@ class DepartmentRepository:
 
     @staticmethod
     def exists_by_name(department_name):
-
         return DepartmentRepository.get_by_name(department_name) is not None

@@ -64,25 +64,11 @@ class StudentService:
         if validation[0] is False:
             return validation
 
-        academic_year = AcademicYearRepository.get_by_id(
-            academic_year_id
-        )
-
-        department = DepartmentRepository.get_by_id(
-            department_id
-        )
-
-        course = CourseRepository.get_by_id(
-            course_id
-        )
-
-        semester = SemesterRepository.get_by_id(
-            semester_id
-        )
-
-        division = DivisionRepository.get_by_id(
-            division_id
-        )
+        academic_year = AcademicYearRepository.get_by_id(academic_year_id)
+        department = DepartmentRepository.get_by_id(department_id)
+        course = CourseRepository.get_by_id(course_id)
+        semester = SemesterRepository.get_by_id(semester_id)
+        division = DivisionRepository.get_by_id(division_id)
 
         if academic_year is None:
             return False, "Academic Year not found."
@@ -116,10 +102,10 @@ class StudentService:
 
         if StudentRepository.exists(college_id, prn):
             return False, "Student already exists."
-
+        prn = StudentService.normalize_optional(prn)
         student = Student(
             college_id=college_id,
-            prn=prn.strip(),
+            prn=prn,
             roll_no=str(roll_no),
             first_name=first_name.strip(),
             middle_name=middle_name.strip(),
@@ -163,53 +149,29 @@ class StudentService:
                        division_id):
 
         return StudentService.add_student(
-
             first_name=student_data["first_name"],
-
             last_name=student_data["last_name"],
-
             admission_year=admission_year,
-
             academic_year_id=academic_year_id,
-
             department_id=department_id,
-
             course_id=course_id,
-
             semester_id=semester_id,
-
             division_id=division_id,
-
             prn=student_data["prn"],
-
             mobile=student_data["mobile"],
-
             email=student_data["email"],
-
             middle_name=student_data["middle_name"],
-
             gender=student_data["gender"],
-
             date_of_birth=student_data["date_of_birth"],
-
             parent_name=student_data["parent_name"],
-
             parent_mobile=student_data["parent_mobile"],
-
             parent_email=student_data["parent_email"],
-
             permanent_address=student_data["permanent_address"],
-
             local_address=student_data["local_address"],
-
             emergency_contact_name=student_data["emergency_contact_name"],
-
             emergency_contact_number=student_data["emergency_contact_number"],
-
             photo=None,
-
             is_active=True
-
         )
     # ==========================================================
     # UPDATE STUDENT
@@ -297,7 +259,7 @@ class StudentService:
             return False, "Student already exists."
 
         student.college_id = college_id
-        student.prn = prn.strip()
+        student.prn = StudentService.normalize_optional(prn)
         student.first_name = first_name.strip()
         student.middle_name = middle_name.strip()
         student.last_name = last_name.strip()
@@ -345,102 +307,58 @@ class StudentService:
     # ==========================================================
 
     @staticmethod
-    def get_student(student_id):
-
-        return StudentRepository.get_by_id(student_id)
+    def get_student(student_id): return StudentRepository.get_by_id(student_id)
 
     # ==========================================================
     # GET ALL STUDENTS
     # ==========================================================
 
     @staticmethod
-    def get_all_students():
+    def get_all_students(): return StudentRepository.get_all()
 
-        return StudentRepository.get_all()
+    # ==========================================================
+    # GET STUDENTS BY DIVISION
+    # ==========================================================
 
-        # ==========================================================
+    @staticmethod
+    def get_students_by_division(division_id):
+
+        return StudentRepository.get_by_division(
+            division_id
+        )
+    
+    # ==========================================================
     # GET EXISTING IMPORT DATA
     # ==========================================================
 
     @staticmethod
-    def get_existing_import_data():
-
-        return StudentRepository.get_existing_import_data()
-
-    # ==========================================================
-    # GET EXISTING IMPORT DATA
-    # ==========================================================
-
-    @staticmethod
-    def get_existing_import_data():
-
-        return StudentRepository.get_existing_import_data()
+    def get_existing_import_data(): return StudentRepository.get_existing_import_data()
 
     # ==========================================================
     # STUDENT EXISTS
     # ==========================================================
 
     @staticmethod
-    def student_exists(
-            college_id,
-            prn,
-            student_id=None
-    ):
-
-        return StudentRepository.exists(
-            college_id,
-            prn,
-            student_id
-        )
+    def student_exists(college_id, prn, student_id=None):
+        return StudentRepository.exists(college_id, prn, student_id)
 
     # ==========================================================
     # GET NEXT ROLL NUMBER
     # ==========================================================
 
     @staticmethod
-    def get_next_roll_no(
-            academic_year_id,
-            course_id,
-            semester_id,
-            division_id
-    ):
-
-        return StudentRepository.get_next_roll_no(
-            academic_year_id,
-            course_id,
-            semester_id,
-            division_id
-        )
-        # ==========================================================
+    def get_next_roll_no(academic_year_id, course_id, semester_id, division_id):
+        return StudentRepository.get_next_roll_no(academic_year_id, course_id, semester_id, division_id)
+    # ==========================================================
     # GENERATE COLLEGE ID
     # ==========================================================
 
     @staticmethod
-    def generate_college_id(
-            admission_year,
-            department,
-            course,
-            division,
-            roll_no
-    ):
+    def generate_college_id(admission_year, department, course, division, roll_no):
 
-        department_code = getattr(
-            department,
-            "department_code",
-            None
-        )
-
-        course_code = getattr(
-            course,
-            "degree",
-            None
-        )
-
-        division_name = getattr(
-            division,
-            "division_name",
-            ""
-        )
+        department_code = getattr(department, "department_code", None)
+        course_code = getattr(course, "degree", None)
+        division_name = getattr(division, "division_name", "")
 
         if not department_code:
             raise ValueError("Department code is not available.")
@@ -450,11 +368,7 @@ class StudentService:
 
         if not division_name:
             raise ValueError("Division name is not available.")
-        
-        print("Department :", department_code)
-        print("Course     :", course_code)
-        print("Division   :", division_name)
-        print("Roll No    :", roll_no)
+
 
         return IDGeneratorService.generate_student_college_id(
             admission_year=admission_year,
@@ -463,19 +377,23 @@ class StudentService:
             division_name=division_name,
             roll_no=roll_no
         )
+    # ==========================================================
+    # NORMALIZE OPTIONAL VALUE
+    # ==========================================================
 
-        college_id = IDGeneratorService.generate_student_college_id(
-            admission_year=admission_year,
-            department_code=department_code,
-            course_code=course_code,
-            division_name=division_name,
-            roll_no=roll_no
-        )
+    @staticmethod
+    def normalize_optional(value):
 
-        print("Generated College ID :", college_id)
+        if value is None:
+            return None
 
-        return college_id
-        # ==========================================================
+        value = str(value).strip()
+
+        if value == "":
+            return None
+
+        return value
+    # ==========================================================
     # VALIDATE STUDENT
     # ==========================================================
 

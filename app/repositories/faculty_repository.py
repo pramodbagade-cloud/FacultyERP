@@ -564,6 +564,54 @@ class FacultyRepository:
         return cursor.fetchone()[0] > 0
 
     # ==========================================================
+    # EXISTS FOR UPDATE
+    # ==========================================================
+
+    @staticmethod
+    def exists_employee_for_update(employee_code, faculty_id):
+
+        conn = DatabaseManager.get_connection()
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM faculty
+            WHERE employee_code=?
+            AND faculty_id<>?
+            """,
+            (
+                employee_code,
+                faculty_id
+            )
+        )
+
+        return cursor.fetchone()[0] > 0
+
+    @staticmethod
+    def exists_pan_for_update(pan_card_no, faculty_id):
+
+        conn = DatabaseManager.get_connection()
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM faculty
+            WHERE pan_card_no=?
+            AND faculty_id<>?
+            """,
+            (
+                pan_card_no,
+                faculty_id
+            )
+        )
+
+        return cursor.fetchone()[0] > 0
+
+    # ==========================================================
     # GENERATE FACULTY CODE
     # ==========================================================
 

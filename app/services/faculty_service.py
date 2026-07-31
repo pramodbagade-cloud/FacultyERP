@@ -89,7 +89,6 @@ class FacultyService:
             mobile=record.get("Mobile", ""),
             email=record.get("Email", ""),
             address=record.get("Address", ""),
-
             pan_card_no=record.get("PAN Card No", ""),
             aadhaar_number=record.get("Aadhaar Number", ""),
             blood_group=record.get("Blood Group", ""),
@@ -101,7 +100,6 @@ class FacultyService:
             joining_department_date=record.get("Joining Department Date", ""),
             university_approval_number=record.get("University Approval Number", ""),
             university_approval_date=record.get("University Approval Date", ""),
-
             department_id=department_id,
             designation=record.get("Designation", ""),
             joining_date=record.get("Joining Date", ""),
@@ -121,7 +119,7 @@ class FacultyService:
             remarks=record.get("Remarks", "")
 
         )
-        # ==========================================================
+    # ==========================================================
     # ADD FACULTY
     # ==========================================================
 
@@ -209,8 +207,8 @@ class FacultyService:
         if employee_code == "":
             return False, "Employee Code is required."
 
-        if pan_card_no == "":
-            return False, "PAN Card Number is required."
+        #if pan_card_no == "":
+        #    return False, "PAN Card Number is required."
 
         if department_id == 0:
             return False, "Please select Department."
@@ -226,7 +224,7 @@ class FacultyService:
 
         if FacultyRepository.exists(employee_code):
             return False, "Employee Code already exists."
-        
+
         if FacultyRepository.exists_pan(pan_card_no):
             return False, "PAN Card Number already exists."
 
@@ -275,7 +273,7 @@ class FacultyService:
         FacultyRepository.add(faculty)
 
         return True, "Faculty saved successfully."
-        # ==========================================================
+    # ==========================================================
     # GET ALL FACULTY
     # ==========================================================
 
@@ -385,32 +383,27 @@ class FacultyService:
 
         if first_name == "":
             return False, "First Name is required."
-
         if last_name == "":
             return False, "Last Name is required."
-
         if employee_code == "":
             return False, "Employee Code is required."
-
-        if pan_card_no == "":
-            return False, "PAN Card Number is required."
-
+        #if pan_card_no == "":
+        #    return False, "PAN Card Number is required."
         if department_id == 0:
             return False, "Please select Department."
-
         if designation == "":
             return False, "Please select Designation."
-
         if mobile != "" and not Validation.is_mobile(mobile):
             return False, "Invalid Mobile Number."
-
         if email != "" and not Validation.is_email(email):
             return False, "Invalid Email Address."
-
         existing = FacultyRepository.get_by_id(faculty_id)
-
         if existing is None:
             return False, "Faculty record not found."
+        if FacultyRepository.exists_employee_for_update(employee_code, faculty_id):
+            return False, "Employee Code already exists."
+        if FacultyRepository.exists_pan_for_update(pan_card_no, faculty_id):
+            return False, "PAN Card Number already exists."
 
         faculty = Faculty(
             faculty_id=faculty_id,
@@ -457,5 +450,15 @@ class FacultyService:
         FacultyRepository.update(faculty)
 
         return True, "Faculty updated successfully."
+    # ==========================================================
+    # DELETE FACULTY
+    # ==========================================================
+    @staticmethod
+    def delete_faculty(faculty_id):
+        existing = FacultyRepository.get_by_id(faculty_id)
+        if existing is None:
+            return False, "Faculty record not found."
+        FacultyRepository.delete(faculty_id)
+        return True, "Faculty deleted successfully."
 
     

@@ -7,30 +7,22 @@ Course Management
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-
 import customtkinter as ctk
-
 from app.services.course_service import CourseService
 from app.services.department_service import DepartmentService
 
 
 class CourseWindow:
     """Course Management Window."""
-
     # ==========================================================
     # CONSTRUCTOR
     # ==========================================================
 
     def __init__(self, parent):
-
         self.parent = parent
-
         self.selected_course_id = None
-
         self.department_map = {}
-
         self.build_ui()
-
         self.initialize()
 
     # ==========================================================
@@ -38,17 +30,9 @@ class CourseWindow:
     # ==========================================================
 
     def initialize(self):
-
-        self.update_button.configure(
-            state="disabled"
-        )
-
-        self.delete_button.configure(
-            state="disabled"
-        )
-
+        self.update_button.configure(state="disabled")
+        self.delete_button.configure(state="disabled")
         self.load_departments()
-
         self.load_courses()
 
     # ==========================================================
@@ -58,124 +42,33 @@ class CourseWindow:
     def build_ui(self):
 
         for widget in self.parent.winfo_children():
-
             widget.destroy()
-
-        self.parent.grid_rowconfigure(
-            3,
-            weight=1
-        )
-
-        self.parent.grid_columnconfigure(
-            0,
-            weight=1
-        )
+        self.parent.grid_rowconfigure(3, weight=1)
+        self.parent.grid_columnconfigure(0, weight=1)
 
         # =====================================================
         # TITLE
         # =====================================================
 
-        title = ctk.CTkLabel(
-
-            self.parent,
-
-            text="Course Management",
-
-            font=("Segoe UI", 24, "bold")
-
-        )
-
-        title.grid(
-
-            row=0,
-
-            column=0,
-
-            sticky="w",
-
-            padx=20,
-
-            pady=(15, 10)
-
-        )
+        title = ctk.CTkLabel(self.parent, text="Course Management", font=("Segoe UI", 24, "bold"))
+        title.grid(row=0, column=0, sticky="w", padx=20, pady=(15, 10))
 
         # =====================================================
         # FORM
         # =====================================================
 
-        form = ctk.CTkFrame(
-
-            self.parent
-
-        )
-
-        form.grid(
-
-            row=1,
-
-            column=0,
-
-            sticky="ew",
-
-            padx=20
-
-        )
-
-        form.grid_columnconfigure(
-            1,
-            weight=1
-        )
-
-        form.grid_columnconfigure(
-            3,
-            weight=1
-        )
+        form = ctk.CTkFrame(self.parent)
+        form.grid(row=1, column=0, sticky="ew", padx=20 )
+        form.grid_columnconfigure(1, weight=1)
+        form.grid_columnconfigure(3, weight=1)
 
         # =====================================================
         # COURSE CODE
         # =====================================================
 
-        ctk.CTkLabel(
-
-            form,
-
-            text="Course ID"
-
-        ).grid(
-
-            row=0,
-
-            column=0,
-
-            padx=10,
-
-            pady=8,
-
-            sticky="w"
-
-        )
-
-        self.code_entry = ctk.CTkEntry(
-
-            form,
-
-            state="readonly"
-
-        )
-
-        self.code_entry.grid(
-
-            row=0,
-
-            column=1,
-
-            padx=10,
-
-            pady=8,
-
-            sticky="ew"
-
-        )
+        ctk.CTkLabel(form, text="Course ID").grid(row=0, column=0, padx=10, pady=8, sticky="w" )
+        self.code_entry = ctk.CTkEntry(form, state="readonly")
+        self.code_entry.grid(row=0, column=1, padx=10, pady=8, sticky="ew")
 
         # =====================================================
         # DEPARTMENT

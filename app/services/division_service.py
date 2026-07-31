@@ -47,7 +47,7 @@ class DivisionService:
             raise ValueError("Division already exists.")
 
         division=Division(
-            division_code="",
+            division_code=DivisionRepository.generate_division_code(),
             division_name=division_name,
             department_id=department_id,
             course_id=course_id,
