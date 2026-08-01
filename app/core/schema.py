@@ -174,6 +174,7 @@ class DatabaseSchema:
             (
                 subject_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 subject_code TEXT UNIQUE NOT NULL,
+                university_subject_code TEXT,
                 subject_name TEXT NOT NULL,
                 subject_short_name TEXT NOT NULL,
                 department_id INTEGER NOT NULL,

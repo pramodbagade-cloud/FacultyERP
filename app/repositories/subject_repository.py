@@ -26,6 +26,7 @@ class SubjectRepository:
             INSERT INTO subjects
             (
                 subject_code,
+                university_subject_code,
                 subject_name,
                 subject_short_name,
                 department_id,
@@ -41,11 +42,12 @@ class SubjectRepository:
 
             VALUES
             (
-                ?,?,?,?,?,?,?,?,?,?,?,?
+                ?,?,?,?,?,?,?,?,?,?,?,?,?
             )
             """,
             (
                 subject.subject_code,
+                subject.university_subject_code,
                 subject.subject_name,
                 subject.subject_short_name,
                 subject.department_id,
@@ -56,12 +58,11 @@ class SubjectRepository:
                 subject.theory_hours,
                 subject.practical_hours,
                 subject.tutorial_hours,
-                subject.description,
-            ),
+                subject.description
+            )
         )
 
         conn.commit()
-
     # ==========================================================
     # GET ALL
     # ==========================================================
@@ -95,6 +96,7 @@ class SubjectRepository:
                 Subject(
                     subject_id=row["subject_id"],
                     subject_code=row["subject_code"],
+                    university_subject_code=row["university_subject_code"],
                     subject_name=row["subject_name"],
                     subject_short_name=row["subject_short_name"],
                     department_id=row["department_id"],
@@ -165,6 +167,7 @@ class SubjectRepository:
                     subject_id=row["subject_id"],
 
                     subject_code=row["subject_code"],
+                    university_subject_code=row["university_subject_code"],
 
                     subject_name=row["subject_name"],
 
@@ -225,6 +228,7 @@ class SubjectRepository:
         return Subject(
             subject_id=row["subject_id"],
             subject_code=row["subject_code"],
+            university_subject_code=row["university_subject_code"],
             subject_name=row["subject_name"],
             subject_short_name=row["subject_short_name"],
             department_id=row["department_id"],
@@ -256,6 +260,7 @@ class SubjectRepository:
             SET
 
                 subject_code=?,
+                university_subject_code=?,
 
                 subject_name=?,
 
@@ -287,6 +292,7 @@ class SubjectRepository:
             (
 
                 subject.subject_code,
+                subject.university_subject_code,
 
                 subject.subject_name,
 

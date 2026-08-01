@@ -18,6 +18,7 @@ class SubjectService:
     @staticmethod
     def add_subject(
 
+            university_subject_code,
             subject_name,
 
             subject_short_name,
@@ -45,6 +46,7 @@ class SubjectService:
         subject_name = subject_name.strip()
 
         subject_short_name = subject_short_name.strip().upper()
+        university_subject_code = university_subject_code.strip().upper()
 
         description = description.strip()
 
@@ -85,6 +87,7 @@ class SubjectService:
         subject = Subject(
 
             subject_code=subject_code,
+            university_subject_code=university_subject_code,
 
             subject_name=subject_name,
 
@@ -169,6 +172,7 @@ class SubjectService:
             subject_id,
 
             subject_code,
+            university_subject_code,
 
             subject_name,
 
@@ -201,6 +205,8 @@ class SubjectService:
             subject_id=subject_id,
 
             subject_code=subject_code,
+            university_subject_code=university_subject_code,
+            
 
             subject_name=subject_name.strip(),
 

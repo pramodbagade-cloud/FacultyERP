@@ -17,39 +17,25 @@ from app.services.course_service import CourseService
 
 class SubjectWindow:
     """Subject Management Window."""
-
     def __init__(self, parent):
-
         self.parent = parent
-
         self.selected_subject_id = None
-
         self.department_map = {}
-
         self.course_map = {}
-
         self.build_ui()
-
         self.initialize()
-
     # ==========================================================
     # INITIALIZE
     # ==========================================================
-
     def initialize(self):
-
         self.update_button.configure(
             state="disabled"
         )
-
         self.delete_button.configure(
             state="disabled"
         )
-
         self.load_departments()
-
         self.load_courses()
-
         self.load_subjects()
 
     # ==========================================================
@@ -61,16 +47,8 @@ class SubjectWindow:
         for widget in self.parent.winfo_children():
 
             widget.destroy()
-
-        self.parent.grid_rowconfigure(
-            3,
-            weight=1
-        )
-
-        self.parent.grid_columnconfigure(
-            0,
-            weight=1
-        )
+        self.parent.grid_rowconfigure(3,weight=1)
+        self.parent.grid_columnconfigure(0, weight=1)
 
         # =====================================================
         # TITLE
@@ -124,6 +102,7 @@ class SubjectWindow:
 
         form.grid_columnconfigure(1, weight=1)
         form.grid_columnconfigure(3, weight=1)
+        form.grid_columnconfigure(5, weight=1)
 
         # =====================================================
         # SUBJECT CODE
@@ -133,7 +112,7 @@ class SubjectWindow:
 
             form,
 
-            text="Subject Code"
+            text="ERP Subject Code"
 
         ).grid(
 
@@ -157,13 +136,55 @@ class SubjectWindow:
 
         )
 
+        ctk.CTkLabel(
+
+            form,
+
+            text="Univ. Subject Code"
+
+        ).grid(
+
+            row=0,
+
+            column=2,
+
+            padx=(5,10),
+
+            pady=8,
+
+            sticky="w"
+
+        )
+
+        self.university_subject_code_entry = ctk.CTkEntry(
+
+            form,
+
+            placeholder_text="Enter University Subject Code"
+
+        )
+
+        self.university_subject_code_entry.grid(
+
+            row=0,
+
+            column=3,
+
+            padx=(0,10),
+
+            pady=8,
+
+            sticky="ew"
+
+        )
+
         self.code_entry.grid(
 
             row=0,
 
             column=1,
 
-            padx=10,
+            padx=(10,5),
 
             pady=8,
 
@@ -185,7 +206,7 @@ class SubjectWindow:
 
             row=0,
 
-            column=2,
+            column=4,
 
             padx=10,
 
@@ -207,7 +228,7 @@ class SubjectWindow:
 
             row=0,
 
-            column=3,
+            column=5,
 
             padx=10,
 
@@ -726,7 +747,7 @@ class SubjectWindow:
             "0"
 
         )
-        # =====================================================
+                # =====================================================
         # DESCRIPTION
         # =====================================================
 
@@ -738,37 +759,45 @@ class SubjectWindow:
 
         ).grid(
 
-            row=6,
+            row=1,
 
-            column=0,
+            column=4,
 
-            padx=10,
+            padx=(10,10),
 
             pady=8,
 
-            sticky="w"
+            sticky="nw"
 
         )
 
-        self.description_entry = ctk.CTkEntry(
+        self.description_entry = ctk.CTkTextbox(
 
-            form
+            form,
+
+            height=150
 
         )
 
         self.description_entry.grid(
 
-            row=6,
+            row=2,
 
-            column=1,
+            column=4,
 
-            padx=10,
+            rowspan=5,
 
-            pady=8,
+            columnspan=2,
 
-            sticky="ew"
+            padx=(10,10),
+
+            pady=(0,8),
+
+            sticky="nsew"
 
         )
+
+        form.grid_rowconfigure(6, weight=1)
 
         # =====================================================
         # BUTTON FRAME
@@ -902,7 +931,7 @@ class SubjectWindow:
 
             "ID",
 
-            "Subject Code",
+            "Univ. Subject Code",
 
             "Subject Name",
 
@@ -936,9 +965,9 @@ class SubjectWindow:
 
         self.tree.heading(
 
-            "Subject Code",
+            "Univ. Subject Code",
 
-            text="Subject Code"
+            text="Univ. Subject Code"
 
         )
 
@@ -986,9 +1015,9 @@ class SubjectWindow:
 
         self.tree.column(
 
-            "Subject Code",
+             "Univ. Subject Code",
 
-            width=120,
+            width=150,
 
             anchor="center"
 
@@ -1163,7 +1192,7 @@ class SubjectWindow:
 
                     subject.subject_id,
 
-                    subject.subject_code,
+                    subject.university_subject_code or "",
 
                     subject.subject_name,
 
@@ -1247,6 +1276,8 @@ class SubjectWindow:
 
         success, message = SubjectService.add_subject(
 
+            self.university_subject_code_entry.get(),
+
             self.name_entry.get(),
 
             self.short_name_entry.get(),
@@ -1267,7 +1298,7 @@ class SubjectWindow:
 
             self.tutorial_hours_combo.get(),
 
-            self.description_entry.get()
+            self.description_entry.get("1.0", tk.END).strip()
 
         )
 
@@ -1321,9 +1352,17 @@ class SubjectWindow:
 
         )
 
-        self.description_entry.delete(
+        self.university_subject_code_entry.delete(
 
             0,
+
+            tk.END
+
+        )
+
+        self.description_entry.delete(
+
+            "1.0",
 
             tk.END
 
@@ -1382,7 +1421,8 @@ class SubjectWindow:
         self.load_subjects()
 
         self.name_entry.focus()
-            # ==========================================================
+
+    # ==========================================================
     # ROW SELECTED
     # ==========================================================
 
@@ -1438,6 +1478,19 @@ class SubjectWindow:
 
         )
 
+        self.university_subject_code_entry.delete(
+
+            0,
+
+            tk.END
+
+        )
+
+        self.university_subject_code_entry.insert(
+            0,
+            subject.university_subject_code or ""
+        )
+
         #
         # Subject Name
         #
@@ -1484,7 +1537,7 @@ class SubjectWindow:
 
         self.description_entry.delete(
 
-            0,
+            "1.0",
 
             tk.END
 
@@ -1492,7 +1545,7 @@ class SubjectWindow:
 
         self.description_entry.insert(
 
-            0,
+            "1.0",
 
             subject.description
 
@@ -1616,6 +1669,7 @@ class SubjectWindow:
             self.selected_subject_id,
 
             self.code_entry.get(),
+            self.university_subject_code_entry.get(),
 
             self.name_entry.get(),
 
@@ -1637,7 +1691,13 @@ class SubjectWindow:
 
             self.tutorial_hours_combo.get(),
 
-            self.description_entry.get()
+            self.description_entry.get(                       
+
+                "1.0",
+
+                tk.END
+
+            ).strip()
 
         )
 
