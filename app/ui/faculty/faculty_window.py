@@ -13,7 +13,6 @@ import customtkinter as ctk
 from tkcalendar import DateEntry
 from app.services.faculty_service import FacultyService
 from app.services.department_service import DepartmentService
-from app.ui.faculty_subject_assignment.faculty_subject_assignment_window import (FacultySubjectAssignmentWindow)
 from tkinter import filedialog
 from app.utils.faculty_template import FacultyTemplate
 from app.utils.excel_importer import ExcelImporter
@@ -209,10 +208,7 @@ class FacultyWindow:
         self.delete_button.pack(side="left", padx=5)
         self.clear_button = ctk.CTkButton(button_frame, text="Clear", width=110, command=self.clear_form)
         self.clear_button.pack(side="left", padx=5)
-        self.subject_assignment_button = ctk.CTkButton(button_frame, text="Subject Allocation", width=150,
-            command=self.open_subject_assignment
-        )
-        self.subject_assignment_button.pack(side="left", padx=5)
+        
 
         # =====================================================
         # FACULTY TABLE
@@ -406,6 +402,11 @@ class FacultyWindow:
             "",                             # photo
             ""                              # remarks
         )
+        if success:
+            messagebox.showinfo("Success", message)
+            self.clear_form()
+        else:
+            messagebox.showwarning("Faculty", message)
 
         # ==========================================================
         # ROW SELECTED
@@ -638,6 +639,3 @@ class FacultyWindow:
 
     def export_excel(self):
         messagebox.showinfo("FacultyERP", "Faculty Excel Export will be implemented in the next step.")
-    def open_subject_assignment(self):
-        from app.ui.faculty.faculty_subject_allocation_window import (FacultySubjectAllocationWindow)
-        FacultySubjectAllocationWindow(self.parent)

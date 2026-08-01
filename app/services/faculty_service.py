@@ -205,10 +205,8 @@ class FacultyService:
             return False, "Last Name is required."
 
         if employee_code == "":
+        
             return False, "Employee Code is required."
-
-        #if pan_card_no == "":
-        #    return False, "PAN Card Number is required."
 
         if department_id == 0:
             return False, "Please select Department."
@@ -225,8 +223,6 @@ class FacultyService:
         if FacultyRepository.exists(employee_code):
             return False, "Employee Code already exists."
 
-        if FacultyRepository.exists_pan(pan_card_no):
-            return False, "PAN Card Number already exists."
 
         faculty_code = FacultyRepository.generate_faculty_code()
 
@@ -387,8 +383,6 @@ class FacultyService:
             return False, "Last Name is required."
         if employee_code == "":
             return False, "Employee Code is required."
-        #if pan_card_no == "":
-        #    return False, "PAN Card Number is required."
         if department_id == 0:
             return False, "Please select Department."
         if designation == "":
@@ -402,8 +396,7 @@ class FacultyService:
             return False, "Faculty record not found."
         if FacultyRepository.exists_employee_for_update(employee_code, faculty_id):
             return False, "Employee Code already exists."
-        if FacultyRepository.exists_pan_for_update(pan_card_no, faculty_id):
-            return False, "PAN Card Number already exists."
+
 
         faculty = Faculty(
             faculty_id=faculty_id,
