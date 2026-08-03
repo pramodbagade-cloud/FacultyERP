@@ -103,7 +103,10 @@ class FacultySubjectAllocationService:
             is_active=1
         )
 
-        return FacultySubjectAllocationRepository.add(allocation)
+        allocation_id=FacultySubjectAllocationRepository.add(allocation)
+        if allocation_id:
+            return True,"Faculty subject allocated successfully."
+        return False,"Failed to allocate subject."
     @staticmethod
     def update(
         allocation_id,
@@ -175,7 +178,7 @@ class FacultySubjectAllocationService:
 
     @staticmethod
     def get_by_id(allocation_id):
-        return FacultySubjectAllocationRepository.get_by_id(allocation_id)
+        return FacultySubjectAllocationRepository.get_details_by_id(allocation_id)
 
     @staticmethod
     def get_grid_data():

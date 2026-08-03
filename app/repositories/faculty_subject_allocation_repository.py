@@ -142,6 +142,26 @@ class FacultySubjectAllocationRepository:
         return cursor.fetchone()
 
     @staticmethod
+    def get_details_by_id(allocation_id):
+        connection=DatabaseManager.get_connection()
+        cursor=connection.cursor()
+        cursor.execute(
+            """
+            SELECT
+                fsa.*,
+                s.department_id,
+                s.course_id,
+                s.semester_id
+            FROM faculty_subject_allocations fsa
+            INNER JOIN subjects s
+                ON fsa.subject_id=s.subject_id
+            WHERE fsa.allocation_id=?
+            """,
+            (allocation_id,)
+        )
+        return cursor.fetchone()
+
+    @staticmethod
     def exists(
         faculty_id,
         subject_id,
@@ -220,8 +240,8 @@ class FacultySubjectAllocationRepository:
                     COALESCE(f.middle_name || ' ', '') ||
                     f.last_name
                 ) AS faculty_name,
-                s.subject_code,
-                s.subject_code,
+                s.university_subject_code,
+                s.subject_name,
                 s.subject_name,
                 fsa.batch_name,
                 fsa.theory_hours,
@@ -257,7 +277,11 @@ class FacultySubjectAllocationRepository:
             """
             SELECT
                 fsa.*,
-                f.faculty_name,
+                TRIM(
+                    f.first_name || ' ' ||
+                    COALESCE(f.middle_name || ' ', '') ||
+                    f.last_name
+                ) AS faculty_name,
                 s.subject_code,
                 s.subject_name
             FROM faculty_subject_allocations fsa

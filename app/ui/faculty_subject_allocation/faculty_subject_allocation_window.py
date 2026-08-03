@@ -18,6 +18,7 @@ from app.services.subject_service import SubjectService
 from app.services.faculty_service import FacultyService
 
 
+
 class FacultySubjectAllocationWindow:
     """Faculty Subject Allocation Management."""
 
@@ -51,7 +52,7 @@ class FacultySubjectAllocationWindow:
         self.practical_hours_var = ctk.StringVar(value="0")
         self.tutorial_hours_var = ctk.StringVar(value="0")
         self.workload_var = ctk.StringVar(value="0")
-        self.display_order_var = ctk.StringVar(value="1")
+       
         self.class_teacher_var = ctk.IntVar(value=0)
 
         self.main_frame = None
@@ -67,13 +68,16 @@ class FacultySubjectAllocationWindow:
         self.division_combo = None
         self.subject_combo = None
         self.faculty_combo = None
+        self.theory_value_label = None
+        self.practical_value_label = None
+        self.tutorial_value_label = None
 
         self.batch_combo = None
         self.theory_hours_entry = None
         self.practical_hours_entry = None
         self.tutorial_hours_entry = None
         self.workload_entry = None
-        self.display_order_entry = None
+        
 
         self.class_teacher_check = None
         self.remarks_text = None
@@ -321,6 +325,9 @@ class FacultySubjectAllocationWindow:
             1,
             weight=1
         )
+        # ==========================================================
+        # FACULTY
+        # ==========================================================
 
         ctk.CTkLabel(
             self.left_frame,
@@ -347,6 +354,10 @@ class FacultySubjectAllocationWindow:
             sticky="ew"
         )
 
+        # ==========================================================
+        # SUBJECT
+        # ==========================================================
+
         ctk.CTkLabel(
             self.left_frame,
             text="Subject"
@@ -361,7 +372,8 @@ class FacultySubjectAllocationWindow:
         self.subject_combo = ctk.CTkComboBox(
             self.left_frame,
             variable=self.subject_var,
-            values=[]
+            values=[],
+            command=lambda _:self.on_subject_change()
         )
 
         self.subject_combo.grid(
@@ -371,142 +383,225 @@ class FacultySubjectAllocationWindow:
             pady=5,
             sticky="ew"
         )
+        # ==========================================================
+        # THEORY SECTION
+        # ==========================================================
+
+        theory_frame = ctk.CTkFrame(
+            self.left_frame
+        )
+
+        theory_frame.grid(
+            row=2,
+            column=0,
+            columnspan=2,
+            padx=10,
+            pady=(15,5),
+            sticky="ew"
+        )
+
+        theory_frame.grid_columnconfigure(
+            1,
+            weight=1
+        )
 
         ctk.CTkLabel(
-            self.left_frame,
+            theory_frame,
+            text="THEORY",
+            font=("Segoe UI",13,"bold")
+        ).grid(
+            row=0,
+            column=0,
+            columnspan=2,
+            padx=10,
+            pady=(8,2),
+            sticky="w"
+        )
+
+        ctk.CTkLabel(
+            theory_frame,
+            text="Hours / Week"
+        ).grid(
+            row=1,
+            column=0,
+            padx=10,
+            pady=(0,8),
+            sticky="w"
+        )
+
+        self.theory_value_label = ctk.CTkLabel(
+            theory_frame,
+            text="N/A",
+            height=34,
+            fg_color="#E5E5E5",
+            corner_radius=6,
+            font=("Segoe UI", 12, "bold")
+        )
+
+        self.theory_value_label.grid(
+            row=1,
+            column=1,
+            padx=10,
+            pady=(0,8),
+            sticky="ew"
+        )
+
+        # ==========================================================
+        # PRACTICAL SECTION
+        # ==========================================================
+
+        practical_frame = ctk.CTkFrame(
+            self.left_frame
+        )
+
+        practical_frame.grid(
+            row=3,
+            column=0,
+            columnspan=2,
+            padx=10,
+            pady=5,
+            sticky="ew"
+        )
+
+        practical_frame.grid_columnconfigure(
+            1,
+            weight=1
+        )
+
+        ctk.CTkLabel(
+            practical_frame,
+            text="PRACTICAL",
+            font=("Segoe UI",13,"bold")
+        ).grid(
+            row=0,
+            column=0,
+            columnspan=2,
+            padx=10,
+            pady=(8,2),
+            sticky="w"
+        )
+
+        ctk.CTkLabel(
+            practical_frame,
+            text="Hours / Week"
+        ).grid(
+            row=1,
+            column=0,
+            padx=10,
+            pady=5,
+            sticky="w"
+        )
+
+        self.practical_value_label = ctk.CTkLabel(
+            practical_frame,
+            text="N/A",
+            height=34,
+            fg_color="#E5E5E5",
+            corner_radius=6,
+            font=("Segoe UI", 12, "bold")
+        )
+
+        self.practical_value_label.grid(
+            row=1,
+            column=1,
+            padx=10,
+            pady=5,
+            sticky="ew"
+        )
+
+        ctk.CTkLabel(
+            practical_frame,
             text="Batch"
         ).grid(
             row=2,
             column=0,
             padx=10,
-            pady=5,
+            pady=(0,8),
             sticky="w"
         )
 
-        self.batch_combo = ctk.CTkComboBox(self.left_frame, variable=self.batch_var, values=["Full", "Batch A", "Batch B", "Batch C"])
-        self.batch_combo.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
-        self.batch_combo.set("Full")
-
-        ctk.CTkLabel(
-            self.left_frame,
-            text="Theory Hours"
-        ).grid(
-            row=3,
-            column=0,
-            padx=10,
-            pady=5,
-            sticky="w"
+        self.batch_combo = ctk.CTkComboBox(
+            practical_frame,
+            variable=self.batch_var,
+            values=[
+                "Batch A",
+                "Batch B",
+                "Batch C"
+            ]
         )
 
-        self.theory_hours_entry = ctk.CTkEntry(
-            self.left_frame,
-            textvariable=self.theory_hours_var
-        )
-
-        self.theory_hours_entry.grid(
-            row=3,
+        self.batch_combo.grid(
+            row=2,
             column=1,
             padx=10,
-            pady=5,
+            pady=(0,8),
             sticky="ew"
         )
 
-        ctk.CTkLabel(
-            self.left_frame,
-            text="Practical Hours"
-        ).grid(
+        # ==========================================================
+        # TUTORIAL SECTION
+        # ==========================================================
+
+        tutorial_frame = ctk.CTkFrame(
+            self.left_frame
+        )
+
+        tutorial_frame.grid(
             row=4,
             column=0,
-            padx=10,
-            pady=5,
-            sticky="w"
-        )
-
-        self.practical_hours_entry = ctk.CTkEntry(
-            self.left_frame,
-            textvariable=self.practical_hours_var
-        )
-
-        self.practical_hours_entry.grid(
-            row=4,
-            column=1,
+            columnspan=2,
             padx=10,
             pady=5,
             sticky="ew"
+        )
+
+        tutorial_frame.grid_columnconfigure(
+            1,
+            weight=1
         )
 
         ctk.CTkLabel(
-            self.left_frame,
-            text="Tutorial Hours"
+            tutorial_frame,
+            text="TUTORIAL",
+            font=("Segoe UI",13,"bold")
         ).grid(
-            row=5,
+            row=0,
             column=0,
+            columnspan=2,
             padx=10,
-            pady=5,
+            pady=(8,2),
             sticky="w"
-        )
-
-        self.tutorial_hours_entry = ctk.CTkEntry(
-            self.left_frame,
-            textvariable=self.tutorial_hours_var
-        )
-
-        self.tutorial_hours_entry.grid(
-            row=5,
-            column=1,
-            padx=10,
-            pady=5,
-            sticky="ew"
         )
 
         ctk.CTkLabel(
-            self.left_frame,
-            text="Workload"
+            tutorial_frame,
+            text="Hours / Week"
         ).grid(
-            row=6,
+            row=1,
             column=0,
             padx=10,
-            pady=5,
+            pady=(0,8),
             sticky="w"
         )
-
-        self.workload_entry = ctk.CTkEntry(
-            self.left_frame,
-            textvariable=self.workload_var,
-            state="readonly"
+        self.tutorial_value_label = ctk.CTkLabel(
+            tutorial_frame,
+            text="N/A",
+            height=34,
+            fg_color="#E5E5E5",
+            corner_radius=6,
+            font=("Segoe UI", 12, "bold")
         )
 
-        self.workload_entry.grid(
-            row=6,
+        self.tutorial_value_label.grid(
+            row=1,
             column=1,
             padx=10,
-            pady=5,
+            pady=(0,8),
             sticky="ew"
         )
-
-        ctk.CTkLabel(
-            self.left_frame,
-            text="Display Order"
-        ).grid(
-            row=7,
-            column=0,
-            padx=10,
-            pady=5,
-            sticky="w"
-        )
-
-        self.display_order_entry = ctk.CTkEntry(
-            self.left_frame,
-            textvariable=self.display_order_var
-        )
-
-        self.display_order_entry.grid(
-            row=7,
-            column=1,
-            padx=10,
-            pady=5,
-            sticky="ew"
-        )
+        # ==========================================================
+        # CLASS TEACHER
+        # ==========================================================
 
         self.class_teacher_check = ctk.CTkCheckBox(
             self.left_frame,
@@ -515,43 +610,54 @@ class FacultySubjectAllocationWindow:
         )
 
         self.class_teacher_check.grid(
-            row=8,
+            row=5,
             column=0,
             columnspan=2,
             padx=10,
-            pady=10,
+            pady=(15,5),
             sticky="w"
         )
+
+        # ==========================================================
+        # REMARKS
+        # ==========================================================
 
         ctk.CTkLabel(
             self.left_frame,
             text="Remarks"
         ).grid(
-            row=9,
+            row=6,
             column=0,
+            columnspan=2,
             padx=10,
-            pady=(5,0),
-            sticky="nw"
+            pady=(10,2),
+            sticky="w"
         )
 
         self.remarks_text = ctk.CTkTextbox(
             self.left_frame,
-            height=100
+            height=120
         )
 
         self.remarks_text.grid(
-            row=9,
-            column=1,
+            row=7,
+            column=0,
+            columnspan=2,
             padx=10,
-            pady=(5,10),
+            pady=(0,10),
             sticky="nsew"
         )
 
+        # ==========================================================
+        # LEFT PANEL LAYOUT
+        # ==========================================================
+
         self.left_frame.grid_rowconfigure(
-            9,
+            7,
             weight=1
         )
 
+        
         # ==========================================================
         # RIGHT PANEL
         # ==========================================================
@@ -576,7 +682,8 @@ class FacultySubjectAllocationWindow:
             0,
             weight=1
         )
-                # ==========================================================
+
+        # ==========================================================
         # BUTTON FRAME
         # ==========================================================
 
@@ -682,7 +789,6 @@ class FacultySubjectAllocationWindow:
             "Practical",
             "Tutorial",
             "Workload",
-            "Display Order",
             "Status"
         )
 
@@ -711,18 +817,17 @@ class FacultySubjectAllocationWindow:
         )
 
         column_widths = {
-            "Academic Year": 120,
-            "Division": 90,
-            "Faculty": 220,
-            "Subject Code": 110,
-            "Subject": 240,
-            "Batch": 80,
+            "Academic Year": 100,
+            "Division": 60,
+            "Faculty": 180,
+            "Subject Code": 120,
+            "Subject": 340,
+            "Batch": 70,
             "Theory": 70,
             "Practical": 80,
             "Tutorial": 70,
             "Workload": 80,
-            "Display Order": 90,
-            "Status": 80
+            "Status": 70
         }
 
         for column in columns:
@@ -735,6 +840,8 @@ class FacultySubjectAllocationWindow:
             self.tree.column(
                 column,
                 width=column_widths[column],
+                minwidth=column_widths[column],
+                stretch=(column == "Subject"),
                 anchor="center"
             )
 
@@ -770,6 +877,65 @@ class FacultySubjectAllocationWindow:
             "<<TreeviewSelect>>",
             self.on_tree_select
         )
+
+        self.update_hour_cards(
+            0,
+            0,
+            0
+        )
+
+    # ==========================================================
+    # UPDATE HOUR CARDS
+    # ==========================================================
+
+    def update_hour_cards(
+        self,
+        theory_hours,
+        practical_hours,
+        tutorial_hours
+    ):
+
+        if theory_hours > 0:
+
+            self.theory_value_label.configure(
+                text=f"{theory_hours} Hrs / Week",
+                fg_color="#D5F5E3"
+            )
+
+        else:
+
+            self.theory_value_label.configure(
+                text="N/A",
+                fg_color="#E5E5E5"
+            )
+
+        if practical_hours > 0:
+
+            self.practical_value_label.configure(
+                text=f"{practical_hours} Hrs / Week",
+                fg_color="#D5F5E3"
+            )
+
+        else:
+
+            self.practical_value_label.configure(
+                text="N/A",
+                fg_color="#E5E5E5"
+            )
+
+        if tutorial_hours > 0:
+
+            self.tutorial_value_label.configure(
+                text=f"{tutorial_hours} Hrs / Week",
+                fg_color="#D5F5E3"
+            )
+
+        else:
+
+            self.tutorial_value_label.configure(
+                text="N/A",
+                fg_color="#E5E5E5"
+            )
 
 
     # ==========================================================
@@ -925,8 +1091,28 @@ class FacultySubjectAllocationWindow:
 
     def load_subjects(self):
 
+        department_id = self.get_department_id()
+
         course_id = self.get_course_id()
+
         semester_id = self.get_semester_id()
+        print("========================================")
+        print("Department ID :", department_id)
+        print("Course ID     :", course_id)
+        print("Semester ID   :", semester_id)
+        print("========================================")
+
+        if not department_id or not course_id or not semester_id:
+
+            self.subjects = []
+
+            self.subject_combo.configure(
+                values=[]
+            )
+
+            self.subject_var.set("")
+
+            return
 
         self.subjects = SubjectService.get_subjects_by_course_semester(
             course_id,
@@ -943,12 +1129,14 @@ class FacultySubjectAllocationWindow:
         )
 
         if values:
-            self.subject_var.set(values[0])
-            self.on_subject_change()
-        else:
-            self.subject_var.set("")
-            self.subject_combo.configure(values=[])
 
+            self.subject_var.set(values[0])
+
+            self.on_subject_change()
+
+        else:
+
+            self.subject_var.set("")
     # ==========================================================
     # LOAD FACULTY
     # ==========================================================
@@ -1149,152 +1337,124 @@ class FacultySubjectAllocationWindow:
         else:
             self.workload_var.set(f"{total:.1f}")
 
-
     def on_subject_change(self):
-
-        subject_name = self.subject_var.get()
-
+        selected_subject=self.subject_var.get().strip()
         for subject in self.subjects:
-
-            if subject.subject_name == subject_name:
-
-                self.theory_hours_var.set(str(subject.theory_hours))
-                self.practical_hours_var.set(str(subject.practical_hours))
-                self.tutorial_hours_var.set(str(subject.tutorial_hours))
-
+            if subject.subject_name.strip()==selected_subject:
+                theory=subject.theory_hours or 0
+                practical=subject.practical_hours or 0
+                tutorial=subject.tutorial_hours or 0
+                self.theory_hours_var.set(str(theory))
+                self.practical_hours_var.set(str(practical))
+                self.tutorial_hours_var.set(str(tutorial))
+                self.update_hour_cards(theory,practical,tutorial)
+                if practical>0:
+                    self.batch_combo.configure(state="normal")
+                    if self.batch_var.get()=="":
+                        self.batch_var.set("Batch A")
+                else:
+                    self.batch_combo.configure(state="disabled")
+                    self.batch_var.set("N/A")
                 self.calculate_workload()
-
                 return
-    
+        self.theory_hours_var.set("0")
+        self.practical_hours_var.set("0")
+        self.tutorial_hours_var.set("0")
+        self.update_hour_cards(0,0,0)
+        self.batch_combo.configure(state="disabled")
+        self.batch_var.set("N/A")
     # ==========================================================
     # TREE SELECTION
     # ==========================================================
-
-    def on_tree_select(self, event):
-
-        selection = self.tree.selection()
-
+    def on_tree_select(self,event):
+        selection=self.tree.selection()
         if not selection:
             return
-
-        self.allocation_id = int(selection[0])
-
-        allocation = FacultySubjectAllocationService.get_by_id(
-            self.allocation_id
-        )
-
+        self.selected_allocation_id=int(selection[0])
+        allocation=FacultySubjectAllocationService.get_by_id(self.selected_allocation_id)
+        print("========================================")
+        print("ALLOCATION")
+        print("========================================")
+        print("Columns :", allocation.keys())
+        print(dict(allocation))
+        print("========================================")
+        print("========================================")
         if allocation is None:
             return
+        allocation = dict(allocation)
+        self.academic_year_var.set(self.get_academic_year_name(allocation["academic_year_id"]))
 
-        self.faculty_var.set(
-            self.get_faculty_name(
-                allocation[1]
-            )
-        )
+        print("Department from allocation =",allocation["department_id"])
+        print("Department name =",self.get_department_name(allocation["department_id"]))
+        print("Departments =",[(d.department_id,d.department_name) for d in self.departments])
 
-        self.subject_var.set(
-            self.get_subject_name(
-                allocation[2]
-            )
-        )
-
-        self.academic_year_var.set(
-            self.get_academic_year_name(
-                allocation[3]
-            )
-        )
-
-        self.division_var.set(
-            self.get_division_name(
-                allocation[4]
-            )
-        )
-
-        self.batch_var.set(
-            allocation[5]
-        )
-
-        self.theory_hours_var.set(
-            str(allocation[6])
-        )
-
-        self.practical_hours_var.set(
-            str(allocation[7])
-        )
-
-        self.tutorial_hours_var.set(
-            str(allocation[8])
-        )
-
-        self.workload_var.set(
-            str(allocation[9])
-        )
-
-        self.class_teacher_var.set(
-            allocation[10]
-        )
-
-        self.display_order_var.set(
-            str(allocation[11])
-        )
-
-        self.remarks_text.delete(
-            "1.0",
-            "end"
-        )
-
-        self.remarks_text.insert(
-            "1.0",
-            allocation[12] if allocation[12] else ""
-        )
+        self.department_var.set(self.get_department_name(allocation["department_id"]))
+        self.load_faculty()
+        self.load_courses()
+        self.course_var.set(self.get_course_name(allocation["course_id"]))
+        self.load_semesters()
+        self.semester_var.set(self.get_semester_name(allocation["semester_id"]))
+        self.load_divisions()
+        self.division_var.set(self.get_division_name(allocation["division_id"]))
+        self.load_subjects()
+        self.subject_var.set(self.get_subject_name(allocation["subject_id"]))
+        self.faculty_var.set(self.get_faculty_name(allocation["faculty_id"]))
+        self.batch_var.set(allocation["batch_name"])
+        self.theory_hours_var.set(str(allocation["theory_hours"]))
+        self.practical_hours_var.set(str(allocation["practical_hours"]))
+        self.tutorial_hours_var.set(str(allocation["tutorial_hours"]))
+        self.workload_var.set(str(allocation["workload_hours"]))
+        self.update_hour_cards(allocation["theory_hours"],allocation["practical_hours"],allocation["tutorial_hours"])
+        self.class_teacher_var.set(allocation["is_class_teacher"])
+        self.remarks_text.delete("1.0","end")
+        self.remarks_text.insert("1.0",allocation["remarks"] if allocation["remarks"] else "")
     # ==========================================================
     # SAVE
     # ==========================================================
 
     def save_allocation(self):
-
+        faculty_id=self.get_faculty_id()
+        subject_id=self.get_subject_id()
+        academic_year_id=self.get_academic_year_id()
+        division_id=self.get_division_id()
+        if faculty_id==0:
+            messagebox.showwarning("Validation","Please select Faculty.")
+            return
+        if subject_id==0:
+            messagebox.showwarning("Validation","Please select Subject.")
+            return
+        if division_id==0:
+            messagebox.showwarning("Validation","Please select Division.")
+            return
         try:
-
-            FacultySubjectAllocationService.add(
-                faculty_id=self.get_faculty_id(),
-                subject_id=self.get_subject_id(),
-                academic_year_id=self.get_academic_year_id(),
-                division_id=self.get_division_id(),
+            success,message=FacultySubjectAllocationService.add(
+                faculty_id=faculty_id,
+                subject_id=subject_id,
+                academic_year_id=academic_year_id,
+                division_id=division_id,
                 batch_name=self.batch_var.get().strip(),
                 theory_hours=float(self.theory_hours_var.get() or 0),
                 practical_hours=float(self.practical_hours_var.get() or 0),
                 tutorial_hours=float(self.tutorial_hours_var.get() or 0),
                 is_class_teacher=self.class_teacher_var.get(),
-                display_order=int(self.display_order_var.get() or 1),
-                remarks=self.remarks_text.get(
-                    "1.0",
-                    "end"
-                ).strip()
+                display_order=1,
+                remarks=self.remarks_text.get("1.0","end").strip()
             )
-
-            messagebox.showinfo(
-                "Success",
-                "Faculty Subject Allocation saved successfully."
-            )
-
-            self.load_allocations()
-
-            self.clear_fields()
-
+            if success:
+                messagebox.showinfo("Success",message)
+                self.load_allocations()
+                self.new_record()
+            else:
+                messagebox.showwarning("Validation",message)
         except Exception as ex:
-
-            messagebox.showerror(
-                "Error",
-                str(ex)
-            )
-
+            messagebox.showerror("Error",str(ex))
     # ==========================================================
     # UPDATE
     # ==========================================================
 
     def update_allocation(self):
 
-        if self.allocation_id is None:
+        if self.selected_allocation_id is None:    
 
             messagebox.showwarning(
                 "Warning",
@@ -1306,7 +1466,7 @@ class FacultySubjectAllocationWindow:
         try:
 
             FacultySubjectAllocationService.update(
-                allocation_id=self.allocation_id,
+                allocation_id=self.selected_allocation_id,
                 faculty_id=self.get_faculty_id(),
                 subject_id=self.get_subject_id(),
                 academic_year_id=self.get_academic_year_id(),
@@ -1316,7 +1476,7 @@ class FacultySubjectAllocationWindow:
                 practical_hours=float(self.practical_hours_var.get() or 0),
                 tutorial_hours=float(self.tutorial_hours_var.get() or 0),
                 is_class_teacher=self.class_teacher_var.get(),
-                display_order=int(self.display_order_var.get() or 1),
+                display_order=1,
                 remarks=self.remarks_text.get(
                     "1.0",
                     "end"
@@ -1330,7 +1490,8 @@ class FacultySubjectAllocationWindow:
 
             self.load_allocations()
 
-            self.clear_fields()
+            self.tree.selection_set(str(self.selected_allocation_id))
+            self.tree.focus(str(self.selected_allocation_id))
 
         except Exception as ex:
 
@@ -1417,11 +1578,11 @@ class FacultySubjectAllocationWindow:
                     row[8],
                     row[9],
                     row[10],
-                    row[11],
                     status
                 )
             )
-                # ==========================================================
+
+    # ==========================================================
     # CLEAR FIELDS
     # ==========================================================
 
@@ -1434,7 +1595,6 @@ class FacultySubjectAllocationWindow:
         self.practical_hours_var.set("0")
         self.tutorial_hours_var.set("0")
         self.workload_var.set("0")
-        self.display_order_var.set("1")
         self.class_teacher_var.set(0)
 
         self.remarks_text.delete(
@@ -1536,9 +1696,7 @@ class FacultySubjectAllocationWindow:
     # ==========================================================
 
     def new_record(self):
-
         self.reset_form()
-
         self.enable_new_mode()
 
     # ==========================================================
@@ -1621,7 +1779,8 @@ class FacultySubjectAllocationWindow:
         self.load_semesters()
 
     def on_semester_change(self):
-
+        print("Semester Selected :",self.semester_var.get())
+        print("Semester ID :",self.get_semester_id())
         self.load_divisions()
         self.load_subjects()
 
